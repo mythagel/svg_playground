@@ -27,6 +27,8 @@
 #include <string>
 #include <stdexcept>
 #include <vector>
+#include <memory>
+#include <boost/optional.hpp>
 
 namespace dom
 {
@@ -42,7 +44,7 @@ namespace dom
         unsigned short code;
     };
 
-    enum : unsigned short
+    enum ExceptionCode : unsigned short
     {
         INDEX_SIZE_ERR                 = 1,
         DOMSTRING_SIZE_ERR             = 2,
@@ -65,15 +67,15 @@ namespace dom
 
     struct Node
     {
-        DOMString namespaceURI() const;
-        DOMString localName() const;
-        Node parentNode() const;
-        Document ownerDocument() const;
-        DOMString textContent() const;
-        void textContent(const DOMString& context);
-        Node appendChild(Node newChild); // throw(DOMException);
-        Node insertBefore(Node newChild, Node refChild); // throw(DOMException);
-        Node removeChild(Node oldChild); // throw(DOMException);
+        boost::optional<DOMString> namespaceURI() const;
+        boost::optional<DOMString> localName() const;
+        boost::optional<Node> parentNode() const;
+        boost::optional<Document> ownerDocument() const;
+        boost::optional<DOMString> textContent() const;
+        void textContent(const boost::optional<DOMString>& context);
+        Node appendChild(const Node& newChild); // throw(DOMException);
+        Node insertBefore(const Node& newChild, const Node& refChild); // throw(DOMException);
+        Node removeChild(const Node& oldChild); // throw(DOMException);
         Node cloneNode(bool deep);
     };
 
@@ -88,17 +90,17 @@ namespace dom
 
     struct Element : Node, ElementTraversal
     {
-        DOMString getAttributeNS(const DOMString& namespaceURI, const DOMString& localName); // throw(DOMException);  
-        void setAttributeNS(const DOMString& namespaceURI, const DOMString& qualifiedName, const DOMString& value); // throw(DOMException);
+        DOMString getAttributeNS(const boost::optional<DOMString>& namespaceURI, const DOMString& localName); // throw(DOMException);  
+        void setAttributeNS(const boost::optional<DOMString>& namespaceURI, const DOMString& qualifiedName, const DOMString& value); // throw(DOMException);
         DOMString getAttribute(const DOMString& name);
         void setAttribute(const DOMString& name, const DOMString& value); // throw(DOMException);
     };
 
     struct Document : Node
     {
-        Element createElementNS(const DOMString& namespaceURI, const DOMString& qualifiedName); // throw(DOMException);
+        Element createElementNS(const boost::optional<DOMString>& namespaceURI, const DOMString& qualifiedName); // throw(DOMException);
         Element documentElement() const;
-        Element getElementById(const DOMString& elementId);
+        boost::optional<Element> getElementById(const DOMString& elementId);
     };
 
     struct Location
@@ -109,7 +111,7 @@ namespace dom
 
     struct Window
     {
-        Window parent() const;
+        boost::optional<Window> parent() const;
         Location location() const;
     };
 
@@ -126,7 +128,7 @@ namespace views
 
     struct DocumentView
     {
-        AbstractView defaultView() const;
+        boost::optional<AbstractView> defaultView() const;
     };
 
 };
@@ -143,13 +145,14 @@ namespace events
 
     struct EventTarget
     {
-        void addEventListener(const DOMString& type, EventListener listener, bool useCapture);
-        void removeEventListener(const DOMString& type, EventListener listener, bool useCapture);
+        void addEventListener(const DOMString& type, std::shared_ptr<EventListener> listener, bool useCapture);
+        void removeEventListener(const DOMString& type, std::shared_ptr<EventListener> listener, bool useCapture);
     };
 
     struct EventListener
     {
-        void handleEvent(Event evt);
+        virtual void handleEvent(Event& evt) =0;
+        virtual ~EventListener();
     };
 
     struct Event
@@ -161,7 +164,7 @@ namespace events
         bool defaultPrevented() const;
         void stopPropagation();
         void preventDefault();
-    };    
+    };
 
     struct UIEvent : Event
     {
@@ -170,33 +173,33 @@ namespace events
 
     struct MouseEvent : UIEvent
     {
-        long screenX() const;
-        long screenY() const;
-        long clientX() const;
-        long clientY() const;
-        unsigned short button() const;
+        const long screenX;
+        const long screenY;
+        const long clientX;
+        const long clientY;
+        const unsigned short button;
     };
 
     struct MouseWheelEvent : MouseEvent
     {
-        long wheelDelta() const;
+        const long wheelDelta;
     };
 
     struct TextEvent : UIEvent
     {
-        DOMString data() const;
+        const DOMString data;
     };
 
     struct KeyboardEvent : UIEvent
     {
-        DOMString keyIdentifier() const;
+        const DOMString keyIdentifier;
     };
 
     struct ProgressEvent : Event
     {
-        bool lengthComputable() const;
-        unsigned long loaded() const;
-        unsigned long total() const;
+        const bool lengthComputable;
+        const unsigned long loaded;
+        const unsigned long total;
     };
 
 };
@@ -215,7 +218,7 @@ namespace smil
 
     struct TimeEvent : Event
     {
-        long detail() const;
+        const long detail;
     };
 
 };
@@ -239,7 +242,6 @@ namespace svg
     struct SVGLocatableElement;
     struct SVGElement;
     struct SVGTimedElement;
-    struct SVGAnimationElement;
     struct SVGDocument;
     struct SVGGlobal;
 
@@ -249,7 +251,7 @@ namespace svg
         unsigned short code;
     };
 
-    enum : unsigned short
+    enum ExceptionCode : unsigned short
     {
         SVG_WRONG_TYPE_ERR         = 0,
         SVG_INVALID_VALUE_ERR      = 1,
@@ -274,30 +276,30 @@ namespace svg
         float getFloatTrait(const DOMString& name); // throw(DOMException);
         std::vector<float> getFloatListTrait(const DOMString& name); // throw(DOMException);
         SVGMatrix getMatrixTrait(const DOMString& name); // throw(DOMException);
-        SVGRect getRectTrait(const DOMString& name); // throw(DOMException);
+        boost::optional<SVGRect> getRectTrait(const DOMString& name); // throw(DOMException);
         SVGPath getPathTrait(const DOMString& name); // throw(DOMException);
-        SVGRGBColor getRGBColorTrait(const DOMString& name); // throw(DOMException);
+        boost::optional<SVGRGBColor> getRGBColorTrait(const DOMString& name); // throw(DOMException);
         DOMString getPresentationTrait(const DOMString& name); // throw(DOMException);
         DOMString getPresentationTraitNS(const DOMString& namespaceURI, const DOMString& name); // throw(DOMException);
         float getFloatPresentationTrait(const DOMString& name); // throw(DOMException);
         std::vector<float> getFloatListPresentationTrait(const DOMString& name); // throw(DOMException);
         SVGMatrix getMatrixPresentationTrait(const DOMString& name); // throw(DOMException);
-        SVGRect getRectPresentationTrait(const DOMString& name); // throw(DOMException);
+        boost::optional<SVGRect> getRectPresentationTrait(const DOMString& name); // throw(DOMException);
         SVGPath getPathPresentationTrait(const DOMString& name); // throw(DOMException);
-        SVGRGBColor getRGBColorPresentationTrait(const DOMString& name); // throw(DOMException);
+        boost::optional<SVGRGBColor> getRGBColorPresentationTrait(const DOMString& name); // throw(DOMException);
         void setTrait(const DOMString& name, const DOMString& value); // throw(DOMException);
         void setTraitNS(const DOMString& namespaceURI, const DOMString& name, const DOMString& value); // throw(DOMException);
         void setFloatTrait(const DOMString& name, float value); // throw(DOMException);
         void setFloatListTrait(const DOMString& name, const std::vector<float>& value); // throw(DOMException);
-        void setMatrixTrait(const DOMString& name, SVGMatrix matrix); // throw(DOMException);
-        void setRectTrait(const DOMString& name, SVGRect rect); // throw(DOMException);
-        void setPathTrait(const DOMString& name, SVGPath path); // throw(DOMException);
-        void setRGBColorTrait(const DOMString& name, SVGRGBColor color); // throw(DOMException);
+        void setMatrixTrait(const DOMString& name, const SVGMatrix& matrix); // throw(DOMException);
+        void setRectTrait(const DOMString& name, const SVGRect& rect); // throw(DOMException);
+        void setPathTrait(const DOMString& name, const SVGPath& path); // throw(DOMException);
+        void setRGBColorTrait(const DOMString& name, const SVGRGBColor& color); // throw(DOMException);
     };
 
     struct SVGElement : Element, EventTarget, TraitAccess
     {
-        DOMString id() const;
+        boost::optional<DOMString> id() const;
         void id(const DOMString& id) const;
     };
 
@@ -342,8 +344,8 @@ namespace svg
         void currentScale(float scale);
         float currentRotate() const;
         void currentRotate(float rotate);
-        SVGPoint currentTranslate() const;
-        SVGRect viewport() const;
+        SVGPoint& currentTranslate() const;
+        const SVGRect& viewport() const;
         float getCurrentTime();
         void setCurrentTime(float seconds);
         SVGMatrix createSVGMatrixComponents(float a, float b, float c, float d, float e, float f);
@@ -352,8 +354,8 @@ namespace svg
         SVGPath createSVGPath();
         SVGRGBColor createSVGRGBColor(float red, float green, float blue); // throw(SVGException);
         void moveFocus(unsigned short motionType); // throw(DOMException);
-        void setFocus(EventTarget theObject); // throw(DOMException);
-        EventTarget getCurrentFocusedObject();
+        void setFocus(const EventTarget& theObject); // throw(DOMException);
+        EventTarget& getCurrentFocusedObject();
     };
 
     struct SVGRGBColor
@@ -384,7 +386,7 @@ namespace svg
         void x(float x);
         float y() const;
         void y(float y);
-        SVGPoint matrixTransform(SVGMatrix matrix);
+        SVGPoint matrixTransform(const SVGMatrix& matrix) const;
     };
 
     struct SVGPath
@@ -410,16 +412,12 @@ namespace svg
 
     struct SVGMatrix
     {
-        float getComponent(unsigned long index); // throw(DOMException);
-        SVGMatrix mMultiply(SVGMatrix secondMatrix);
-        SVGMatrix inverse(); // throw(SVGException);
-        SVGMatrix mTranslate(float x, float y);
-        SVGMatrix mScale(float scaleFactor);
-        SVGMatrix mRotate(float angle);
-    };
-
-    struct SVGAnimationElement : SVGTimedElement
-    {
+        float getComponent(unsigned long index) const; // throw(DOMException);
+        SVGMatrix& mMultiply(SVGMatrix secondMatrix);
+        SVGMatrix& inverse(); // throw(SVGException);
+        SVGMatrix& mTranslate(float x, float y);
+        SVGMatrix& mScale(float scaleFactor);
+        SVGMatrix& mRotate(float angle);
     };
 
     struct SVGVisualMediaElement : SVGLocatableElement, SVGTimedElement
@@ -439,28 +437,23 @@ namespace svg
 
     struct AsyncURLStatus
     {
-        bool success() const;
-        DOMString contentType() const;
-        DOMString content() const;
+        const bool success;
+        const boost::optional<DOMString> contentType;
+        const boost::optional<DOMString> content;
     };
 
     struct AsyncStatusCallback
     {
-        void operationComplete(AsyncURLStatus status);
+        virtual void operationComplete(const AsyncURLStatus& status) =0;
+        virtual ~AsyncStatusCallback();
     };
 
     struct SVGGlobal
     {
        SVGTimer createTimer(long initialInterval, long repeatInterval);
-       void getURL(const DOMString& iri, AsyncStatusCallback callback);
-       void postURL(const DOMString& iri, const DOMString& data, AsyncStatusCallback callback, const DOMString& type, const DOMString& encoding);
-       Node parseXML(const DOMString& data, Document contextDoc);
-    };
-
-    struct EventListenerInitializer2
-    {
-        void initializeEventListeners(Element scriptElement);
-        EventListener createEventListener(Element handlerElement);
+       void getURL(const DOMString& iri, std::shared_ptr<AsyncStatusCallback> callback);
+       void postURL(const DOMString& iri, const DOMString& data, std::shared_ptr<AsyncStatusCallback> callback, const DOMString& type, const DOMString& encoding);
+       boost::optional<Node> parseXML(const DOMString& data, Document contextDoc);
     };
 
 };
