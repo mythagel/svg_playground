@@ -30,17 +30,15 @@
 
 namespace dom
 {
-    typedef std::u16string DOMString;
+    // spec requires u16 (std::u16string). Changed to std::string for own purposes.
+    typedef std::string DOMString;
     struct Node;
     struct Element;
     struct Document;
 
     struct DOMException : std::runtime_error
     {
-        explicit DOMException(unsigned short code)
-         : code(code), std::runtime_error()
-        {
-        }
+        explicit DOMException(unsigned short code);
         unsigned short code;
     };
 
@@ -73,10 +71,19 @@ namespace dom
         Document ownerDocument() const;
         DOMString textContent() const;
         void textContent(const DOMString& context);
-        Node appendChild(in Node newChild); // throw(DOMException);
-        Node insertBefore(in Node newChild, in Node refChild); // throw(DOMException);
-        Node removeChild(in Node oldChild); // throw(DOMException);
+        Node appendChild(Node newChild); // throw(DOMException);
+        Node insertBefore(Node newChild, Node refChild); // throw(DOMException);
+        Node removeChild(Node oldChild); // throw(DOMException);
         Node cloneNode(bool deep);
+    };
+
+    struct ElementTraversal
+    {
+        Element firstElementChild() const;
+        Element lastElementChild() const;
+        Element nextElementSibling() const;
+        Element previousElementSibling() const;
+        unsigned long childElementCount() const;
     };
 
     struct Element : Node, ElementTraversal
@@ -92,15 +99,6 @@ namespace dom
         Element createElementNS(const DOMString& namespaceURI, const DOMString& qualifiedName); // throw(DOMException);
         Element documentElement() const;
         Element getElementById(const DOMString& elementId);
-    };
-
-    struct ElementTraversal 
-    {
-        Element firstElementChild() const;
-        Element lastElementChild() const;
-        Element nextElementSibling() const;
-        Element previousElementSibling() const;
-        unsigned long childElementCount() const;
     };
 
     struct Location
@@ -145,13 +143,13 @@ namespace events
 
     struct EventTarget
     {
-        void addEventListener(const DOMString& type, in EventListener listener, bool useCapture);
-        void removeEventListener(const DOMString& type, in EventListener listener, bool useCapture);
+        void addEventListener(const DOMString& type, EventListener listener, bool useCapture);
+        void removeEventListener(const DOMString& type, EventListener listener, bool useCapture);
     };
 
     struct EventListener
     {
-        void handleEvent(in Event evt);
+        void handleEvent(Event evt);
     };
 
     struct Event
@@ -165,8 +163,13 @@ namespace events
         void preventDefault();
     };    
 
+    struct UIEvent : Event
+    {
+        long detail() const;
+    };
+
     struct MouseEvent : UIEvent
-    {        
+    {
         long screenX() const;
         long screenY() const;
         long clientX() const;
@@ -174,28 +177,23 @@ namespace events
         unsigned short button() const;
     };
 
-    struct MouseWheelEvent : MouseEvent     
-    {        
+    struct MouseWheelEvent : MouseEvent
+    {
         long wheelDelta() const;
     };
 
-    struct TextEvent : UIEvent    
-    {        
+    struct TextEvent : UIEvent
+    {
         DOMString data() const;
     };
 
-    struct KeyboardEvent : UIEvent     
-    {        
+    struct KeyboardEvent : UIEvent
+    {
         DOMString keyIdentifier() const;
     };
 
-    struct UIEvent : Event     
-    {        
-        long detail() const;
-    };
-
-    struct ProgressEvent : Event     
-    {        
+    struct ProgressEvent : Event
+    {
         bool lengthComputable() const;
         unsigned long loaded() const;
         unsigned long total() const;
@@ -215,8 +213,8 @@ namespace smil
         void endElement();
     };
 
-    struct TimeEvent : Event     
-    {        
+    struct TimeEvent : Event
+    {
         long detail() const;
     };
 
@@ -245,16 +243,65 @@ namespace svg
     struct SVGDocument;
     struct SVGGlobal;
 
-    exception SVGException
+    struct SVGException : std::runtime_error
     {
+        explicit SVGException(unsigned short code);
         unsigned short code;
     };
 
-    const unsigned short SVG_WRONG_TYPE_ERR         = 0;
-    const unsigned short SVG_INVALID_VALUE_ERR      = 1;
-    const unsigned short SVG_MATRIX_NOT_INVERTABLE  = 2;
+    enum : unsigned short
+    {
+        SVG_WRONG_TYPE_ERR         = 0,
+        SVG_INVALID_VALUE_ERR      = 1,
+        SVG_MATRIX_NOT_INVERTABLE  = 2
+    };
 
-    struct SVGDocument : Document, EventTarget 
+    struct SVGDocument : Document, EventTarget
+    {
+    };
+
+    struct SVGLocatable
+    {
+        SVGRect   getBBox();
+        SVGMatrix getScreenCTM();
+        SVGRect   getScreenBBox();
+    };
+
+    struct TraitAccess
+    {
+        DOMString getTrait(const DOMString& name); // throw(DOMException);
+        DOMString getTraitNS(const DOMString& namespaceURI, const DOMString& name); // throw(DOMException);
+        float getFloatTrait(const DOMString& name); // throw(DOMException);
+        std::vector<float> getFloatListTrait(const DOMString& name); // throw(DOMException);
+        SVGMatrix getMatrixTrait(const DOMString& name); // throw(DOMException);
+        SVGRect getRectTrait(const DOMString& name); // throw(DOMException);
+        SVGPath getPathTrait(const DOMString& name); // throw(DOMException);
+        SVGRGBColor getRGBColorTrait(const DOMString& name); // throw(DOMException);
+        DOMString getPresentationTrait(const DOMString& name); // throw(DOMException);
+        DOMString getPresentationTraitNS(const DOMString& namespaceURI, const DOMString& name); // throw(DOMException);
+        float getFloatPresentationTrait(const DOMString& name); // throw(DOMException);
+        std::vector<float> getFloatListPresentationTrait(const DOMString& name); // throw(DOMException);
+        SVGMatrix getMatrixPresentationTrait(const DOMString& name); // throw(DOMException);
+        SVGRect getRectPresentationTrait(const DOMString& name); // throw(DOMException);
+        SVGPath getPathPresentationTrait(const DOMString& name); // throw(DOMException);
+        SVGRGBColor getRGBColorPresentationTrait(const DOMString& name); // throw(DOMException);
+        void setTrait(const DOMString& name, const DOMString& value); // throw(DOMException);
+        void setTraitNS(const DOMString& namespaceURI, const DOMString& name, const DOMString& value); // throw(DOMException);
+        void setFloatTrait(const DOMString& name, float value); // throw(DOMException);
+        void setFloatListTrait(const DOMString& name, const std::vector<float>& value); // throw(DOMException);
+        void setMatrixTrait(const DOMString& name, SVGMatrix matrix); // throw(DOMException);
+        void setRectTrait(const DOMString& name, SVGRect rect); // throw(DOMException);
+        void setPathTrait(const DOMString& name, SVGPath path); // throw(DOMException);
+        void setRGBColorTrait(const DOMString& name, SVGRGBColor color); // throw(DOMException);
+    };
+
+    struct SVGElement : Element, EventTarget, TraitAccess
+    {
+        DOMString id() const;
+        void id(const DOMString& id) const;
+    };
+
+    struct SVGLocatableElement : SVGElement, SVGLocatable
     {
     };
 
@@ -262,10 +309,17 @@ namespace svg
     {
     };
 
-    struct SVGElementInstance : EventTarget 
+    struct SVGElementInstance : EventTarget
     {
         SVGElement correspondingElement() const;
         SVGUseElement correspondingUseElement() const;
+    };
+
+    struct SVGTimedElement : SVGElement, smil::ElementTimeControl
+    {
+        void pauseElement();
+        void resumeElement();
+        bool isPaused() const;
     };
 
     struct SVGSVGElement : SVGLocatableElement, SVGTimedElement
@@ -284,8 +338,10 @@ namespace svg
             NAV_LEFT           = 10,
             NAV_UP_LEFT        = 11
         };
-        attribute float currentScale;
-        attribute float currentRotate;
+        float currentScale() const;
+        void currentScale(float scale);
+        float currentRotate() const;
+        void currentRotate(float rotate);
         SVGPoint currentTranslate() const;
         SVGRect viewport() const;
         float getCurrentTime();
@@ -294,35 +350,41 @@ namespace svg
         SVGRect createSVGRect();
         SVGPoint createSVGPoint();
         SVGPath createSVGPath();
-        SVGRGBColor createSVGRGBColor(float red, float green, float blue) 
-		raises(SVGException);
-        void moveFocus(unsigned short motionType) 
-		raises(DOMException);
-        void setFocus(in EventTarget theObject) 
-		raises(DOMException);
+        SVGRGBColor createSVGRGBColor(float red, float green, float blue); // throw(SVGException);
+        void moveFocus(unsigned short motionType); // throw(DOMException);
+        void setFocus(EventTarget theObject); // throw(DOMException);
         EventTarget getCurrentFocusedObject();
     };
 
     struct SVGRGBColor
     {
-        attribute unsigned long red;
-        attribute unsigned long green;
-        attribute unsigned long blue;
+        unsigned long red() const;
+        void red(unsigned long r);
+        unsigned long green() const;
+        void green(unsigned long g);
+        unsigned long blue() const;
+        void blue(unsigned long b);
     };
 
     struct SVGRect
     {
-        attribute float x;
-        attribute float y;
-        attribute float width;
-        attribute float height;
+        float x() const;
+        void x(float x);
+        float y() const;
+        void y(float y);
+        float width() const;
+        void width(float w);
+        float height() const;
+        void height(float h);
     };
 
     struct SVGPoint
     {
-        attribute float x;
-        attribute float y;
-        SVGPoint matrixTransform(in SVGMatrix matrix);
+        float x() const;
+        void x(float x);
+        float y() const;
+        void y(float y);
+        SVGPoint matrixTransform(SVGMatrix matrix);
     };
 
     struct SVGPath
@@ -349,105 +411,56 @@ namespace svg
     struct SVGMatrix
     {
         float getComponent(unsigned long index); // throw(DOMException);
-        SVGMatrix mMultiply(in SVGMatrix secondMatrix);
+        SVGMatrix mMultiply(SVGMatrix secondMatrix);
         SVGMatrix inverse(); // throw(SVGException);
         SVGMatrix mTranslate(float x, float y);
         SVGMatrix mScale(float scaleFactor);
         SVGMatrix mRotate(float angle);
     };
 
-    struct SVGLocatable
-    { 
-        SVGRect   getBBox();
-        SVGMatrix getScreenCTM();
-        SVGRect   getScreenBBox();
-    };
-
-    struct SVGLocatableElement : SVGElement, SVGLocatable
-    {
-    };
-
-    struct TraitAccess
-    {
-        DOMString getTrait(const DOMString& name); // throw(DOMException);
-        DOMString getTraitNS(const DOMString& namespaceURI, const DOMString& name); // throw(DOMException);
-        float getFloatTrait(const DOMString& name); // throw(DOMException);
-        std::vector<float> getFloatListTrait(const DOMString& name); // throw(DOMException);
-        SVGMatrix getMatrixTrait(const DOMString& name); // throw(DOMException);
-        SVGRect getRectTrait(const DOMString& name); // throw(DOMException);
-        SVGPath getPathTrait(const DOMString& name); // throw(DOMException);
-        SVGRGBColor getRGBColorTrait(const DOMString& name); // throw(DOMException);
-        DOMString getPresentationTrait(const DOMString& name); // throw(DOMException);
-        DOMString getPresentationTraitNS(const DOMString& namespaceURI, const DOMString& name); // throw(DOMException);
-        float getFloatPresentationTrait(const DOMString& name); // throw(DOMException);
-        std::vector<float> getFloatListPresentationTrait(const DOMString& name); // throw(DOMException);
-        SVGMatrix getMatrixPresentationTrait(const DOMString& name); // throw(DOMException);
-        SVGRect getRectPresentationTrait(const DOMString& name); // throw(DOMException);
-        SVGPath getPathPresentationTrait(const DOMString& name); // throw(DOMException);
-        SVGRGBColor getRGBColorPresentationTrait(const DOMString& name); // throw(DOMException);
-        void setTrait(const DOMString& name, const DOMString& value); // throw(DOMException);
-        void setTraitNS(const DOMString& namespaceURI, const DOMString& name, const DOMString& value); // throw(DOMException);
-        void setFloatTrait(const DOMString& name, float value); // throw(DOMException);
-        void setFloatListTrait(const DOMString& name, const std::vector<float>& value); // throw(DOMException);
-        void setMatrixTrait(const DOMString& name, in SVGMatrix matrix); // throw(DOMException);
-        void setRectTrait(const DOMString& name, in SVGRect rect); // throw(DOMException);
-        void setPathTrait(const DOMString& name, in SVGPath path); // throw(DOMException);
-        void setRGBColorTrait(const DOMString& name, in SVGRGBColor color); // throw(DOMException);
-    };
-
-    struct SVGElement : Element, EventTarget, TraitAccess
-    {
-        attribute DOMString id;
-    };
-
-    struct SVGTimedElement : SVGElement, smil::ElementTimeControl
-    {
-        void pauseElement();
-        void resumeElement();
-        bool isPaused() const;
-    };
-
     struct SVGAnimationElement : SVGTimedElement
     {
     };
 
-    struct SVGVisualMediaElement : SVGLocatableElement, SVGTimedElement 
+    struct SVGVisualMediaElement : SVGLocatableElement, SVGTimedElement
     {
     };
 
     struct SVGTimer : events::EventTarget
     {
-       attribute long delay;
-       attribute long repeatInterval;
+       long delay() const;
+       void delay(long delay);
+       long repeatInterval() const;
+       void repeatInterval(long repeat);
        bool running() const;
        void start();
        void stop();
     };
 
-    struct SVGGlobal
-    {
-       SVGTimer createTimer(long initialInterval, long repeatInterval);
-       void getURL(const DOMString& iri, in AsyncStatusCallback callback);
-       void postURL(const DOMString& iri, const DOMString& data, in AsyncStatusCallback callback, const DOMString& type, const DOMString& encoding);
-       Node parseXML(const DOMString& data, in Document contextDoc);
-    };
-
-    struct AsyncStatusCallback 
-    {
-        void operationComplete(in AsyncURLStatus status);
-    };
-
-    struct AsyncURLStatus 
+    struct AsyncURLStatus
     {
         bool success() const;
         DOMString contentType() const;
         DOMString content() const;
     };
 
+    struct AsyncStatusCallback
+    {
+        void operationComplete(AsyncURLStatus status);
+    };
+
+    struct SVGGlobal
+    {
+       SVGTimer createTimer(long initialInterval, long repeatInterval);
+       void getURL(const DOMString& iri, AsyncStatusCallback callback);
+       void postURL(const DOMString& iri, const DOMString& data, AsyncStatusCallback callback, const DOMString& type, const DOMString& encoding);
+       Node parseXML(const DOMString& data, Document contextDoc);
+    };
+
     struct EventListenerInitializer2
     {
-        void initializeEventListeners(in Element scriptElement);
-        EventListener createEventListener(in Element handlerElement);
+        void initializeEventListeners(Element scriptElement);
+        EventListener createEventListener(Element handlerElement);
     };
 
 };
