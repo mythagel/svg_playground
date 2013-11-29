@@ -30,6 +30,17 @@
 #include <memory>
 #include <boost/optional.hpp>
 
+/*
+Script binding for theoretical c++ based svg renderer. 
+It is not indended that this interface be used in a script sense, but rather
+as an interface for a precompiled svg document.
+
+i.e. the SVG document would be converted to code with the script sections expanded 
+accessing the api below.
+
+At the moment all of this is theory and there is no implementation backing this api.
+*/
+
 namespace dom
 {
     // spec requires u16 (std::u16string). Changed to std::string for own purposes.
