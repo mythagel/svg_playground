@@ -1,0 +1,141 @@
+
+<!-- ==============================================================
+      SVG12-RNG | Core attribute
+     ============================================================== -->
+
+<grammar ns='http://www.w3.org/2000/svg'
+         xml:lang='en'
+         xmlns='http://relaxng.org/ns/structure/1.0'
+         xmlns:a='http://relaxng.org/ns/compatibility/annotations/1.0'
+         xmlns:svg='http://www.w3.org/2005/02/svg-annotations'
+         datatypeLibrary='http://www.w3.org/2001/XMLSchema-datatypes'
+         >
+
+  <define name='svg.CoreCommon.attr' combine='interleave'>
+    <choice>
+      <group>
+        <attribute name='xml:id' svg:animatable='false' svg:inheritable='false'>
+          <ref name='NCName.datatype'/>
+        </attribute>
+        <optional>
+          <attribute name='id' svg:animatable='false' svg:inheritable='false'>
+            <ref name='NCName.datatype'/>
+          </attribute>
+        </optional>
+      </group>
+      <optional>
+        <attribute name='id' svg:animatable='false' svg:inheritable='false'>
+          <ref name='NCName.datatype'/>
+        </attribute>
+      </optional>
+    </choice>
+    <optional>
+      <attribute name='class' svg:animatable='false' svg:inheritable='false'>
+        <text/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name='xml:base' svg:animatable='false' svg:inheritable='false'>
+        <ref name='IRI.datatype'/>
+      </attribute>
+    </optional>
+    <optional xml:id='lang'>
+      <attribute name='xml:lang' svg:animatable='false' svg:inheritable='false'>
+        <choice>
+          <ref name='LanguageID.datatype'/>
+          <empty/>
+        </choice>
+      </attribute>
+    </optional>
+    
+      <optional>
+        <attribute name="translate" ns="http://www.w3.org/2005/11/its">
+          <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">The Translate data category information to be attached to the current node.</a:documentation>
+          <choice>
+            <value>yes</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">The nodes need to be translated.</a:documentation>          
+            <value>no</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">The nodes must not be translated.</a:documentation>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>        
+        <attribute name="locNote" ns="http://www.w3.org/2005/11/its">
+          <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">Localization note.</a:documentation>
+          <data type="string"/>
+        </attribute>
+      </optional>
+      <optional>        
+        <attribute name="locNoteType" ns="http://www.w3.org/2005/11/its">
+          <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">The type of localization note.</a:documentation>
+          <choice>
+            <value>alert</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">Localization note is an alert.</a:documentation>
+            <value>description</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">Localization note is a description.</a:documentation>            
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="locNoteRef" ns="http://www.w3.org/2005/11/its">
+          <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">URI referring to the location of the localization note.</a:documentation>
+                  <data type="anyURI"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="termInfoRef" ns="http://www.w3.org/2005/11/its">
+          <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">Pointer to a resource containing
+            information about the term.</a:documentation>          
+          <data type="anyURI"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="term" ns="http://www.w3.org/2005/11/its">
+          <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">Indicates a term locally.</a:documentation>          
+          <choice>
+            <value>yes</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">The value 'yes' means that this is a term.</a:documentation>
+            <value>no</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">The value 'no' means that this is not a term.</a:documentation>
+          </choice>
+        </attribute>        
+      </optional>
+      <optional>
+        <attribute name="dir" ns="http://www.w3.org/2005/11/its">
+          <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">The text direction for the context.</a:documentation>
+          <choice>
+            <value>ltr</value>            
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">Left-to-right text.</a:documentation>
+            <value>rtl</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">Right-to-left text.</a:documentation>
+            <value>lro</value>
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">Left-to-right override.</a:documentation>
+            <value>rlo</value>            
+            <a:documentation xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0">Right-to-left override.</a:documentation>
+          </choice>
+        </attribute>
+      </optional>
+ </define>
+  <define name='svg.Core.attr' combine='interleave'>
+    <ref name='svg.CoreCommon.attr'/>
+    <optional xml:id='space'>
+      <attribute name='xml:space' svg:animatable='false' svg:inheritable='false'>
+        <choice>
+          <value>default</value>
+          <value>preserve</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+
+
+  <define name='svg.CorePreserve.attr' combine='interleave'>
+    <ref name='svg.CoreCommon.attr'/>
+    <optional>
+      <attribute name='xml:space' svg:animatable='false' svg:inheritable='false'>
+        <value>preserve</value>
+      </attribute>
+    </optional>
+  </define>
+
+</grammar>

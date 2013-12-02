@@ -1,0 +1,24 @@
+<grammar  ns='http://www.w3.org/2000/svg'
+   xml:lang='en'
+   xmlns='http://relaxng.org/ns/structure/1.0'
+   xmlns:a='http://relaxng.org/ns/compatibility/annotations/1.0'
+   xmlns:svg='http://www.w3.org/2005/02/svg-annotations'
+   datatypeLibrary='http://www.w3.org/2001/XMLSchema-datatypes' 
+   xmlns:its="http://www.w3.org/2005/11/its">
+
+   <div xml:id='itsattr'>
+      <define combine="interleave" name="its-local-attributes">
+         <optional>
+            <attribute name="its:translate"  svg:animatable='false' svg:inheritable='false'>
+
+               <choice>
+                  <value>yes</value>
+
+                  <value>no</value>
+
+               </choice>
+            </attribute>
+         </optional>
+      </define>
+   </div>
+</grammar>

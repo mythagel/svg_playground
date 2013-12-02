@@ -1,0 +1,39 @@
+
+<!-- ==============================================================
+      SVG12-RNG | BiDi attributes
+     ============================================================== -->
+
+<grammar ns='http://www.w3.org/2000/svg'
+         xml:lang='en'
+         xmlns='http://relaxng.org/ns/structure/1.0'
+         xmlns:a='http://relaxng.org/ns/compatibility/annotations/1.0'
+         xmlns:svg='http://www.w3.org/2005/02/svg-annotations'
+         datatypeLibrary='http://www.w3.org/2001/XMLSchema-datatypes'
+         >
+  <define name='svg.Properties.attr' combine='interleave'>
+    <ref name='svg.BiDi.attr'/>
+  </define>
+
+  <define name='svg.BiDi.attr' combine='interleave'>
+    <optional xml:id='direction'>
+      <attribute name='direction' svg:animatable='false' svg:inheritable='true'>
+        <choice>
+          <value>ltr</value>
+          <value>rtl</value>
+	        <value>inherit</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional xml:id='unicode-bidi'>
+      <attribute name='unicode-bidi' svg:animatable='false' svg:inheritable='false'>
+        <choice>
+          <value>normal</value>
+          <value>embed</value>
+      	  <value>bidi-override</value>
+      	  <value>inherit</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+
+</grammar>
