@@ -10,8 +10,8 @@ IF(UNIX)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
 ENDIF()
 
-add_executable(xerces_basic xerces.cpp)
-target_link_libraries(xerces_basic xerces-c)
+#add_executable(xerces_basic xerces.cpp)
+#target_link_libraries(xerces_basic xerces-c)
 
 add_subdirectory(src)
 ADD_SUBDIRECTORY(test)

@@ -52,9 +52,17 @@ public:
     };
 
 	virtual void move_to(bool abs, float x, float y) =0;
+
 	virtual void line_to(bool abs, float x, float y) =0;
+	virtual void horizontal_line_to(bool abs, float x) =0;
+	virtual void vertical_line_to(bool abs, float y) =0;
+
 	virtual void curve_to(bool abs, float x1, float y1, float x2, float y2, float x, float y) =0;
-	virtual void curve_to(bool abs, float x1, float y1, float x, float y) =0;
+	virtual void smooth_curve_to(bool abs, float x2, float y2, float x, float y) =0;
+
+	virtual void bezier_curve_to(bool abs, float x1, float y1, float x, float y) =0;
+	virtual void smooth_bezier_curve_to(bool abs, float x, float y) =0;
+
 	virtual void close_path() =0;
 	virtual void eof() =0;
 

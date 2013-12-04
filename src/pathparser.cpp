@@ -25,6 +25,7 @@
 #include "pathparser.h"
 #include <cctype>
 #include <cerrno>
+#include <sstream>
 
 namespace svg
 {
@@ -93,7 +94,7 @@ bool parse_number(const char*& c, const char* const end, float& x)
     errno = 0;
     x = strtof(c, const_cast<char**>(&c));
     throw_if(c == begin || errno, "expected number");
-    throw_if(c >= end, "unexpected eof; strtof consumed too much");
+    throw_if(c > end, "unexpected eof; strtof consumed too much");
     return true;
 }
 
@@ -102,10 +103,11 @@ bool parse_comma_wsp(const char*& c, const char* const end)
     if(!ws_p(*c) && *c != ',')
         return false;
 
-    parse_whitespace(c, end) && throw_if(c == end, "unexpected eof");
+    if(parse_whitespace(c, end) && c == end)
+        return true;
 
-    if(*c == ',')
-        throw_if(++c == end, "unexpected eof");
+    if(*c == ',' && ++c == end)
+        return true;
 
     parse_whitespace(c, end);
     return true;
@@ -131,47 +133,250 @@ bool parser::parse_moveto(const char*& c, const char* const end)
 
     const auto cmd = *c++;
     throw_if(c == end, "unexpected eof");
-    
+
+    parse_whitespace(c, end) && throw_if(c == end, "unexpected eof");
+
     point p;
     throw_if(!parse_coordinate_pair(c, end, p), "expected coordinate-pair");
     move_to(cmd == 'M', p.x, p.y);
 
+    if(c == end)
+        return true;
+
+    /* This is not as strict as the formal grammer.
+     * This code will allow a comma to terminate the coordinate sequence
+     * where the lineto-argument-sequence production would require another
+     * coordinate. */
+    parse_comma_wsp(c, end);
     while(c != end && parse_coordinate_pair(c, end, p))
+    {
         line_to(cmd == 'M', p.x, p.y);
-    
+        parse_comma_wsp(c, end);
+    }
+
     return true;
 }
 bool parser::parse_lineto(const char*& c, const char* const end)
 {
-    return false;
+    if(*c != 'L' && *c != 'l')
+        return false;
+
+    const auto cmd = *c++;
+    throw_if(c == end, "unexpected eof");
+
+    parse_whitespace(c, end) && throw_if(c == end, "unexpected eof");
+
+    point p;
+    throw_if(!parse_coordinate_pair(c, end, p), "expected coordinate-pair");
+    line_to(cmd == 'L', p.x, p.y);
+
+    if(c == end)
+        return true;
+
+    /* This is not as strict as the formal grammer.
+     * This code will allow a comma to terminate the coordinate sequence
+     * where the lineto-argument-sequence production would require another
+     * coordinate. */
+    parse_comma_wsp(c, end);
+    while(c != end && parse_coordinate_pair(c, end, p))
+    {
+        line_to(cmd == 'L', p.x, p.y);
+        parse_comma_wsp(c, end);
+    }
+
+    return true;
 }
 bool parser::parse_horizontal_lineto(const char*& c, const char* const end)
 {
-    return false;
+    if(*c != 'H' && *c != 'h')
+        return false;
+
+    const auto cmd = *c++;
+    throw_if(c == end, "unexpected eof");
+
+    parse_whitespace(c, end) && throw_if(c == end, "unexpected eof");
+
+    float x;
+    throw_if(!parse_number(c, end, x), "expected coordinate");
+    horizontal_line_to(cmd == 'H', x);
+
+    if(c == end)
+        return true;
+
+    parse_comma_wsp(c, end);
+    while(c != end && parse_number(c, end, x))
+    {
+        horizontal_line_to(cmd == 'H', x);
+        parse_comma_wsp(c, end);
+    }
+
+    return true;
 }
 bool parser::parse_vertical_lineto(const char*& c, const char* const end)
 {
-    return false;
+    if(*c != 'V' && *c != 'v')
+        return false;
+
+    const auto cmd = *c++;
+    throw_if(c == end, "unexpected eof");
+
+    parse_whitespace(c, end) && throw_if(c == end, "unexpected eof");
+
+    float y;
+    throw_if(!parse_number(c, end, y), "expected coordinate");
+    vertical_line_to(cmd == 'V', y);
+
+    if(c == end)
+        return true;
+
+    parse_comma_wsp(c, end);
+    while(c != end && parse_number(c, end, y))
+    {
+        vertical_line_to(cmd == 'V', y);
+        parse_comma_wsp(c, end);
+    }
+
+    return true;
 }
 bool parser::parse_curveto(const char*& c, const char* const end)
 {
-    return false;
+    if(*c != 'C' && *c != 'c')
+        return false;
+
+    const auto cmd = *c++;
+    throw_if(c == end, "unexpected eof");
+
+    parse_whitespace(c, end) && throw_if(c == end, "unexpected eof");
+
+    point p1;
+    point p2;
+    point p;
+    throw_if(!parse_coordinate_pair(c, end, p1), "expected coordinate-pair p1");
+    throw_if(c == end, "unexpected eof");
+    parse_comma_wsp(c, end) && throw_if(c == end, "unexpected eof");
+    throw_if(!parse_coordinate_pair(c, end, p2), "expected coordinate-pair p2");
+    throw_if(c == end, "unexpected eof");
+    parse_comma_wsp(c, end) && throw_if(c == end, "unexpected eof");
+    throw_if(!parse_coordinate_pair(c, end, p), "expected coordinate-pair p");
+    curve_to(cmd == 'C', p1.x, p1.y, p2.x, p2.y, p.x, p.y);
+
+    if(c == end)
+        return true;
+
+    parse_comma_wsp(c, end);
+    while(c != end && parse_coordinate_pair(c, end, p1))
+    {
+        throw_if(c == end, "unexpected eof");
+        parse_comma_wsp(c, end) && throw_if(c == end, "unexpected eof");
+        throw_if(!parse_coordinate_pair(c, end, p2), "expected coordinate-pair p2");
+
+        throw_if(c == end, "unexpected eof");
+        parse_comma_wsp(c, end) && throw_if(c == end, "unexpected eof");
+        throw_if(!parse_coordinate_pair(c, end, p), "expected coordinate-pair p");
+
+        curve_to(cmd == 'C', p1.x, p1.y, p2.x, p2.y, p.x, p.y);
+        parse_comma_wsp(c, end);
+    }
+
+    return true;
 }
 bool parser::parse_smooth_curveto(const char*& c, const char* const end)
 {
-    return false;
+    if(*c != 'S' && *c != 's')
+        return false;
+
+    const auto cmd = *c++;
+    throw_if(c == end, "unexpected eof");
+
+    parse_whitespace(c, end) && throw_if(c == end, "unexpected eof");
+
+    point p2;
+    point p;
+    throw_if(!parse_coordinate_pair(c, end, p2), "expected coordinate-pair p2");
+    throw_if(!parse_coordinate_pair(c, end, p), "expected coordinate-pair p");
+    smooth_curve_to(cmd == 'S', p2.x, p2.y, p.x, p.y);
+
+    if(c == end)
+        return true;
+
+    parse_comma_wsp(c, end);
+    while(c != end && parse_coordinate_pair(c, end, p2))
+    {
+        throw_if(c == end, "unexpected eof");
+        parse_comma_wsp(c, end) && throw_if(c == end, "unexpected eof");
+        throw_if(!parse_coordinate_pair(c, end, p), "expected coordinate-pair p");
+
+        smooth_curve_to(cmd == 'S', p2.x, p2.y, p.x, p.y);
+        parse_comma_wsp(c, end);
+    }
+
+    return true;
 }
 bool parser::parse_quadratic_bezier_curveto(const char*& c, const char* const end)
 {
-    return false;
+    if(*c != 'Q' && *c != 'q')
+        return false;
+
+    const auto cmd = *c++;
+    throw_if(c == end, "unexpected eof");
+
+    parse_whitespace(c, end) && throw_if(c == end, "unexpected eof");
+
+    point p1;
+    point p;
+    throw_if(!parse_coordinate_pair(c, end, p1), "expected coordinate-pair p1");
+    throw_if(!parse_coordinate_pair(c, end, p), "expected coordinate-pair p");
+    bezier_curve_to(cmd == 'Q', p1.x, p1.y, p.x, p.y);
+
+    if(c == end)
+        return true;
+
+    parse_comma_wsp(c, end);
+    while(c != end && parse_coordinate_pair(c, end, p1))
+    {
+        throw_if(c == end, "unexpected eof");
+        parse_comma_wsp(c, end) && throw_if(c == end, "unexpected eof");
+        throw_if(!parse_coordinate_pair(c, end, p), "expected coordinate-pair p");
+
+        bezier_curve_to(cmd == 'Q', p1.x, p1.y, p.x, p.y);
+        parse_comma_wsp(c, end);
+    }
+
+    return true;
 }
 bool parser::parse_smooth_quadratic_bezier_curveto(const char*& c, const char* const end)
 {
-    return false;
+    if(*c != 'T' && *c != 't')
+        return false;
+
+    const auto cmd = *c++;
+    throw_if(c == end, "unexpected eof");
+
+    parse_whitespace(c, end) && throw_if(c == end, "unexpected eof");
+
+    point p;
+    throw_if(!parse_coordinate_pair(c, end, p), "expected coordinate-pair");
+    smooth_bezier_curve_to(cmd == 'T', p.x, p.y);
+
+    if(c == end)
+        return true;
+
+    parse_comma_wsp(c, end);
+    while(c != end && parse_coordinate_pair(c, end, p))
+    {
+        smooth_bezier_curve_to(cmd == 'T', p.x, p.y);
+        parse_comma_wsp(c, end);
+    }
+
+    return true;
 }
-bool parser::parse_closepath(const char*& c, const char* const end)
+bool parser::parse_closepath(const char*& c, const char* const)
 {
-    return false;
+    if(*c != 'Z' && *c != 'z')
+        return false;
+    ++c;
+    close_path();
+    return true;
 }
 
 parser::error::error(const std::string& what)
