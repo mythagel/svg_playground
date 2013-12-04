@@ -40,9 +40,10 @@ struct point
     float y;
 };
 
-inline void throw_if(bool cond, const std::string& what)
+inline bool throw_if(bool cond, const std::string& what)
 {
     if(cond) throw parser::error(what);
+    return cond;
 }
 
 bool ws_p(const char c)
@@ -64,45 +65,61 @@ bool parse_whitespace(const char*& c, const char* const end)
     if(!ws_p(*c))
         return false;
 
-    const auto begin = c;
     while(c != end && ws_p(*c))
         ++c;
     return true;
 }
 
-bool match_number(const char*& c, const char* const end)
+bool number_p(const char c)
 {
-    // TODO
-}
-bool match_coordinate_pair(const char*& c, const char* const end)
-{
-    // TODO
+	switch(c)
+	{
+		case '+':
+		case '-':
+		case '.':
+			return true;
+		default:
+			return std::isdigit(c);
+	}
 }
 
-float parse_number(const char*& c, const char* const end)
+bool parse_number(const char*& c, const char* const end, float& x)
 {
+    if(!number_p(*c))
+        return false;
+
     const auto begin = c;
 
     errno = 0;
-    float x = strtof(c, &c);
+    x = strtof(c, const_cast<char**>(&c));
     throw_if(c == begin || errno, "expected number");
-    return x;
+    throw_if(c >= end, "unexpected eof; strtof consumed too much");
+    return true;
 }
 
-point parse_coordinate_pair(const char*& c, const char* const end)
+bool parse_comma_wsp(const char*& c, const char* const end)
 {
-    auto x = parse_number(c, end);
+    if(!ws_p(*c) && *c != ',')
+        return false;
 
-    while(c != end && ws_p(*c))
-        ++c;
-    throw_if(c == end, "unexpected eof");
+    parse_whitespace(c, end) && throw_if(c == end, "unexpected eof");
 
-    if(c == ',') ++c;
-    throw_if(c == end, "unexpected eof");
+    if(*c == ',')
+        throw_if(++c == end, "unexpected eof");
 
-    auto y = parse_number(c, end);
+    parse_whitespace(c, end);
+    return true;
+}
 
-    return {x, y};
+bool parse_coordinate_pair(const char*& c, const char* const end, point& p)
+{
+    if(!parse_number(c, end, p.x))
+        return false;
+
+    parse_comma_wsp(c, end) && throw_if(c == end, "unexpected eof");
+
+    throw_if(!parse_number(c, end, p.y), "expected coordinate-pair");
+    return true;
 }
 
 }
@@ -115,10 +132,12 @@ bool parser::parse_moveto(const char*& c, const char* const end)
     const auto cmd = *c++;
     throw_if(c == end, "unexpected eof");
     
-    auto p = parse_coordinate_pair(c, end);
+    point p;
+    throw_if(!parse_coordinate_pair(c, end, p), "expected coordinate-pair");
     move_to(cmd == 'M', p.x, p.y);
-    
-    // if next token is 
+
+    while(c != end && parse_coordinate_pair(c, end, p))
+        line_to(cmd == 'M', p.x, p.y);
     
     return true;
 }
