@@ -117,9 +117,10 @@ colour::colour(const std::string& str)
 
 std::ostream& operator<<(std::ostream& os, const colour& c)
 {
-    os << '#' << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(c.r) 
-       << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(c.g) 
-       << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(c.b);
+    os << "rgb(" << static_cast<int>(c.r) << ", " << static_cast<int>(c.g) << ", " << static_cast<int>(c.b) << ")";
+//    os << '#' << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(c.r) 
+//       << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(c.g) 
+//       << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(c.b);
     return os;
 }
 

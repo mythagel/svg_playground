@@ -1,2 +1,2 @@
 
-add_library(svg STATIC colour.cpp pathparser.cpp)
+add_library(svg STATIC document.cpp colour.cpp pathparser.cpp types.cpp parsers.cpp)
