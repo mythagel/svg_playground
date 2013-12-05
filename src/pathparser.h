@@ -31,6 +31,7 @@ namespace svg
 namespace path
 {
 
+// TODO use template - the functions below don't need dynamic binding.
 class parser
 {
 private:
