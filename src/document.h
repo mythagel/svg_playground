@@ -95,6 +95,11 @@ timed elements: 'audio', 'animate', 'animateColor', 'animateMotion', 'animateTra
 
 */
 
+struct attribute_tags
+{
+    
+};
+
 struct attribute
 {
     std::string name;
@@ -339,14 +344,31 @@ std::istream& operator>>(std::istream& is, optional_typed_attribute<direction>& 
     else if(tok == "rtl")
         f.value = direction::rtl;
     else if(tok == "inherit")
+    {
+        f.value = boost::none;
         f.inherit = true;
+    }
     else
         throw std::runtime_error("invalid value: " + tok);
     return is;
 }
 std::ostream& operator<<(std::ostream& os, const optional_typed_attribute<direction>& f)
 {
-    os << f.value;
+    if(f.value)
+    {
+        switch(*f.value)
+        {
+            case direction::ltr:
+                os << "ltr";
+                break;
+            case direction::rtl:
+                os << "rtl";
+                break;
+        }
+    }
+    else if(f.inherit)
+        os << "inherit";
+
     return os;
 }
 
