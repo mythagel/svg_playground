@@ -35,14 +35,28 @@
 #include <map>
 #include <functional>
 
-template <std::size_t N>
-auto make_array(char(&s)[N]) -> std::array<char, N>
-{
-    return std::array<char, N>(std::begin(s), std::end(s));
-}
-
 namespace svg
 {
+
+namespace graphic_elements
+{
+
+struct shape
+{
+    //shapes: 'circle', 'ellipse', 'line', 'path', 'polygon', 'polyline' and 'rect'
+    // fill
+    // stroke
+};
+
+struct text
+{
+};
+
+struct media
+{
+};
+
+}
 
 /*
 a node in a document
@@ -84,9 +98,10 @@ timed elements: 'audio', 'animate', 'animateColor', 'animateMotion', 'animateTra
 struct attribute
 {
     std::string name;
+    bool inherit;
 protected:
-    explicit attribute(const std::string& name)
-     : name(name)
+    explicit attribute(const std::string& name, bool inherit = false)
+     : name(name), inherit(inherit)
     {
     }
 public:
@@ -121,7 +136,7 @@ protected:
         return *this;
     }
     
-    void add_attribute(attribute& attr)
+    void expose_attribute(attribute& attr)
     {
         attributes.emplace(attr.name, attr);
     }
@@ -148,6 +163,10 @@ have a map of names to attribute pointers (pointers to own attribute members)
             throw std::runtime_error("unknown attribute");
         return it->second;
     }
+
+    virtual ~element()
+    {
+    }
 };
 
 template <typename T>
@@ -172,18 +191,43 @@ struct typed_attribute : attribute
     {
         return value;
     }
-    std::string get() const
+    std::string get() const override
     {
         std::stringstream s;
-        s << value;
+        s << *this;
         return s.str();
     }
-    void set(const std::string& ss)
+    void set(const std::string& ss) override
     {
         std::stringstream s(ss);
-        s >> value;
+        s >> *this;
     }
 };
+
+// TODO type tags may be needed in the attribute structures, i.e.
+// two datatypes STORED as float values need to be parsed differently
+// i.e. 'three' could be parsed and stored as a float value for a different
+// datatype.
+std::istream& operator>>(std::istream& is, typed_attribute<float>& f)
+{
+    is >> f.value;
+    return is;
+}
+std::ostream& operator<<(std::ostream& os, const typed_attribute<float>& f)
+{
+    os << f.value;
+    return os;
+}
+std::istream& operator>>(std::istream& is, typed_attribute<int>& f)
+{
+    is >> f.value;
+    return is;
+}
+std::ostream& operator<<(std::ostream& os, const typed_attribute<int>& f)
+{
+    os << f.value;
+    return os;
+}
 
 template <typename T>
 struct optional_typed_attribute : attribute
@@ -211,14 +255,14 @@ struct optional_typed_attribute : attribute
         return *value;
     }
     
-    std::string get() const
+    std::string get() const override
     {
         if(!value) throw std::runtime_error("no value");
         std::stringstream s;
         s << *value;
         return s.str();
     }
-    void set(const std::string& ss)
+    void set(const std::string& ss) override
     {
         std::stringstream s(ss);
         T v;
@@ -235,24 +279,24 @@ struct line_element : element
     typed_attribute<float> y2;
 
     optional_typed_attribute<int> stroke_width;
-    void add_attributes()
+    void expose_attributes()
     {
-        add_attribute(x1);
-        add_attribute(y1);
-        add_attribute(x2);
-        add_attribute(x2);
-        add_attribute(stroke_width);
+        expose_attribute(x1);
+        expose_attribute(y1);
+        expose_attribute(x2);
+        expose_attribute(x2);
+        expose_attribute(stroke_width);
     }
 
     line_element()
      : element("line"), x1("x1"), y1("y1"), x2("x2"), y2("y2"), stroke_width("stroke_width")
     {
-        add_attributes();
+        expose_attributes();
     }
     line_element(const line_element& o)
      : element(o), x1(o.x1), y1(o.y1), x2(o.x2), y2(o.y2), stroke_width(o.stroke_width)
     {
-        add_attributes();
+        expose_attributes();
     }
     line_element& operator=(line_element o)
     {
@@ -262,8 +306,12 @@ struct line_element : element
         std::swap(y2, o.y2);
         std::swap(stroke_width, o.stroke_width);
 
-        add_attributes();
+        expose_attributes();
         return *this;
+    }
+    
+    virtual ~line_element()
+    {
     }
 };
 
@@ -281,7 +329,29 @@ enum class unicode_bidi
     embed,
     bidi_override
 };
+
+std::istream& operator>>(std::istream& is, optional_typed_attribute<direction>& f)
+{
+    std::string tok;
+    is >> tok;
+    if(tok == "ltr")
+        f.value = direction::ltr;
+    else if(tok == "rtl")
+        f.value = direction::rtl;
+    else if(tok == "inherit")
+        f.inherit = true;
+    else
+        throw std::runtime_error("invalid value: " + tok);
+    return is;
 }
+std::ostream& operator<<(std::ostream& os, const optional_typed_attribute<direction>& f)
+{
+    os << f.value;
+    return os;
+}
+
+}
+
 
 namespace text
 {
@@ -351,7 +421,7 @@ struct document
     bidi::unicode_bidi unicode_bidi;
     text::display_align display_align;
     text::line_increment line_increment;
-    
+
     // inherit
     types::colour stop_colour;
     float stop_opacity;
