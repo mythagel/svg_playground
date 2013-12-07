@@ -368,7 +368,7 @@ std::ostream& operator<<(std::ostream& os, const optional_typed_attribute<direct
     }
     else if(f.inherit)
         os << "inherit";
-
+// todo how to represent inherit properly.
     return os;
 }
 
