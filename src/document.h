@@ -97,7 +97,11 @@ timed elements: 'audio', 'animate', 'animateColor', 'animateMotion', 'animateTra
 
 struct attribute_tags
 {
-    
+/*
+need to store attribute properties common to all instances of that attribute
+svg:inheritable / inherited are independant.
+svg:animatable as well.
+*/
 };
 
 struct attribute
