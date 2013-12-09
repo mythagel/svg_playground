@@ -1,4 +1,5 @@
 #include "document.h"
+#include "expat.hh"
 #include <iostream>
 
 int main()
