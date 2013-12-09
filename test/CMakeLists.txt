@@ -11,6 +11,11 @@ TARGET_LINK_LIBRARIES(test_path svg)
 ADD_TEST(test_path "${MAKE_CURRENT_BINARY_DIR}/test_path")
 ADD_DEPENDENCIES(check test_path)
 
+ADD_EXECUTABLE(test_transform EXCLUDE_FROM_ALL test_transform.cpp)
+TARGET_LINK_LIBRARIES(test_transform svg)
+ADD_TEST(test_transform "${MAKE_CURRENT_BINARY_DIR}/test_transform")
+ADD_DEPENDENCIES(check test_transform)
+
 ADD_EXECUTABLE(test_document EXCLUDE_FROM_ALL test_document.cpp)
 TARGET_LINK_LIBRARIES(test_document svg)
 ADD_TEST(test_document "${MAKE_CURRENT_BINARY_DIR}/test_document")
