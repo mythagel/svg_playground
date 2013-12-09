@@ -27,7 +27,7 @@ private:
 	XML_Parser m_Parser;
 	static const char NS_CHAR = 0x0C;
 
-	// adapter functions
+	// adapter functions (change to non-capturing lambdas)
 	static void startNamespace(void *userData, const XML_Char *prefix, const XML_Char *uri)
 	{
 		auto parser = static_cast<T*>(userData);
