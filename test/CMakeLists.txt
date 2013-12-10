@@ -20,3 +20,8 @@ ADD_EXECUTABLE(test_document EXCLUDE_FROM_ALL test_document.cpp)
 TARGET_LINK_LIBRARIES(test_document svg)
 ADD_TEST(test_document "${MAKE_CURRENT_BINARY_DIR}/test_document")
 ADD_DEPENDENCIES(check test_document)
+
+ADD_EXECUTABLE(test_expat EXCLUDE_FROM_ALL test_expat.cpp)
+TARGET_LINK_LIBRARIES(test_expat svg expat)
+ADD_TEST(test_expat "${MAKE_CURRENT_BINARY_DIR}/test_expat")
+ADD_DEPENDENCIES(check test_expat)

@@ -21,7 +21,7 @@ struct qname
 };
 
 template <typename T>
-class parser : T
+class parser
 {
 private:
 	XML_Parser m_Parser;
