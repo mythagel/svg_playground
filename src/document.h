@@ -59,6 +59,26 @@ struct media
 }
 
 /*
+
+
+IDEA for inherit.
+maintain state during traversal that contains
+all relvant state information
+e.g
+ boost::optional for all optional attributes
+ drawing state (CTM)
+ etc.
+copy of state is pushed before descending to children.
+i.e. all siblings see the same parent state
+nested children see appropriate state
+obv. all relevant attributes must be updated on traversal
+but this reduces the loopback needed for inherit (makes traversal one way = happy cpu / memory)
+i.e. if an attribute value provided - GREAT - use it!
+otherwise use current value from state (i.e. inherited from parent)
+before descending into next child, pop state - i.e. revert to pre traversal parent state.
+
+
+
 a node in a document
 unlike an xml node that stores data - this node is just an interface
 every node has a node parent? and node children*
@@ -124,7 +144,21 @@ public:
     }
 };
 
-struct element
+struct node
+{
+    boost::optional<std::string> namespaceURI() const;
+    boost::optional<std::string> localName() const;
+    boost::optional<std::reference_wrapper<node>> parentNode() const;
+    //boost::optional<Document> ownerDocument() const;
+    boost::optional<std::string> textContent() const;
+    void textContent(const boost::optional<std::string>& content);
+    node& appendChild(const node& newChild); // throw(DOMException);
+    node& insertBefore(const node& newChild, const node& refChild); // throw(DOMException);
+    node& removeChild(const node& oldChild); // throw(DOMException);
+    node& cloneNode(bool deep);
+};
+
+struct element : node
 {
     std::string name;
 protected:
@@ -165,13 +199,20 @@ have a map of names to attribute pointers (pointers to own attribute members)
 
 */
 
-    attribute& get(const std::string& name)
+    attribute& get(const std::string& name) const
     {
         auto it = attributes.find(name);
         if(it == end(attributes))
             throw std::runtime_error("unknown attribute");
         return it->second;
     }
+
+    // ElementTraversal
+    boost::optional<std::reference_wrapper<element>> firstElementChild() const;
+    boost::optional<std::reference_wrapper<element>> lastElementChild() const;
+    boost::optional<std::reference_wrapper<element>> nextElementSibling() const;
+    boost::optional<std::reference_wrapper<element>> previousElementSibling() const;
+    unsigned long childElementCount() const;
 
     virtual ~element()
     {
@@ -182,12 +223,12 @@ template <typename T>
 struct typed_attribute : attribute
 {
     T value;
-    
+
     explicit typed_attribute(const std::string& name, T default_ = {})
      : attribute(name), value{default_}
     {
     }
-    
+
     explicit operator bool() const
     {
         return true;
