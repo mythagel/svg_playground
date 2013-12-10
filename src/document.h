@@ -35,6 +35,9 @@
 #include <map>
 #include <functional>
 
+// blah test
+#include "svg.h"
+
 namespace svg
 {
 
@@ -60,6 +63,31 @@ struct media
 
 /*
 
+js api almost FORCES a node based (i.e. pointer) data structure for the document
+the DOM api expects no invalidation wrt. insertion of new nodes.
+This means that vector<variant<T, Tn>> is not possible to interface directly.
+
+HOWEVER it should be possible to have an adapter layer.
+
+i.e. SAX layer parsers into standard(ish) DOM nodes +++ special DOM nodes for particular elements
+i.e. the rect element would have a special DOM node - one whose API is similar to element but references
+the internally stored fields directly.
+
+struct rect : node
+{
+    float x;
+    float y;
+    float width;
+    float height;
+    float rx;
+    float ry;
+    
+    // children
+};
+
+all nodes share an api but the implementation differs.
+API to be modeled on svg tiny idl.
+
 
 IDEA for inherit.
 maintain state during traversal that contains
@@ -68,14 +96,13 @@ e.g
  boost::optional for all optional attributes
  drawing state (CTM)
  etc.
-copy of state is pushed before descending to children.
+copy of state is passed to children.
 i.e. all siblings see the same parent state
 nested children see appropriate state
 obv. all relevant attributes must be updated on traversal
 but this reduces the loopback needed for inherit (makes traversal one way = happy cpu / memory)
 i.e. if an attribute value provided - GREAT - use it!
 otherwise use current value from state (i.e. inherited from parent)
-before descending into next child, pop state - i.e. revert to pre traversal parent state.
 
 
 
@@ -146,16 +173,6 @@ public:
 
 struct node
 {
-    boost::optional<std::string> namespaceURI() const;
-    boost::optional<std::string> localName() const;
-    boost::optional<std::reference_wrapper<node>> parentNode() const;
-    //boost::optional<Document> ownerDocument() const;
-    boost::optional<std::string> textContent() const;
-    void textContent(const boost::optional<std::string>& content);
-    node& appendChild(const node& newChild); // throw(DOMException);
-    node& insertBefore(const node& newChild, const node& refChild); // throw(DOMException);
-    node& removeChild(const node& oldChild); // throw(DOMException);
-    node& cloneNode(bool deep);
 };
 
 struct element : node
@@ -206,13 +223,6 @@ have a map of names to attribute pointers (pointers to own attribute members)
             throw std::runtime_error("unknown attribute");
         return it->second;
     }
-
-    // ElementTraversal
-    boost::optional<std::reference_wrapper<element>> firstElementChild() const;
-    boost::optional<std::reference_wrapper<element>> lastElementChild() const;
-    boost::optional<std::reference_wrapper<element>> nextElementSibling() const;
-    boost::optional<std::reference_wrapper<element>> previousElementSibling() const;
-    unsigned long childElementCount() const;
 
     virtual ~element()
     {
