@@ -71,18 +71,29 @@ namespace dom
         TYPE_MISMATCH_ERR              = 17
     };
 
+    struct QName
+    {
+        std::string ns;
+        std::string local;
+    };
+
     struct Node
     {
-        boost::optional<DOMString> namespaceURI() const;
-        boost::optional<DOMString> localName() const;
-        boost::optional<Node> parentNode() const;
-        boost::optional<Document> ownerDocument() const;
-        boost::optional<DOMString> textContent() const;
-        void textContent(const boost::optional<DOMString>& context);
-        Node appendChild(const Node& newChild); // throw(DOMException);
-        Node insertBefore(const Node& newChild, const Node& refChild); // throw(DOMException);
-        Node removeChild(const Node& oldChild); // throw(DOMException);
-        Node cloneNode(bool deep);
+        QName name;
+        std::shared_ptr<Node> parent;
+        std::shared_ptr<Document> document;
+        std::string content;
+        std::shared_ptr<Node> next_sibling;
+        std::shared_ptr<Node> prev_sibling;
+        std::shared_ptr<Node> first_child;
+        std::shared_ptr<Node> last_child;
+        
+        std::shared_ptr<Node> appendChild(std::shared_ptr<Node> newChild); // throw(DOMException);
+        std::shared_ptr<Node> insertBefore(std::shared_ptr<Node> newChild, std::shared_ptr<Node> refChild); // throw(DOMException);
+        std::shared_ptr<Node> removeChild(std::shared_ptr<Node> oldChild); // throw(DOMException);
+        std::shared_ptr<Node> cloneNode(bool deep);
+        
+        virtual ~Node();
     };
 
     struct ElementTraversal
