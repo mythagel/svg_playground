@@ -77,40 +77,78 @@ namespace dom
         std::string local;
     };
 
+    /*
+        Base class for all DOM nodes.
+        Tracks siblings and children
+        siblings are tracked as a linked list
+    */
     struct Node
     {
         QName name;
         std::shared_ptr<Node> parent;
         std::shared_ptr<Document> document;
-        std::string content;
-        std::shared_ptr<Node> next_sibling;
-        std::shared_ptr<Node> prev_sibling;
-        std::shared_ptr<Node> first_child;
-        std::shared_ptr<Node> last_child;
+        struct
+        {
+            std::shared_ptr<Node> next;
+            std::shared_ptr<Node> prev;
+            
+            void reset()
+            {
+                next.reset();
+                prev.reset();
+            }
+        } sibling;
+        struct
+        {
+            std::shared_ptr<Node> first;
+            std::shared_ptr<Node> last;
+            
+            void reset()
+            {
+                next.reset();
+                prev.reset();
+            }
+        } children;
         
-        std::shared_ptr<Node> appendChild(std::shared_ptr<Node> newChild); // throw(DOMException);
-        std::shared_ptr<Node> insertBefore(std::shared_ptr<Node> newChild, std::shared_ptr<Node> refChild); // throw(DOMException);
-        std::shared_ptr<Node> removeChild(std::shared_ptr<Node> oldChild); // throw(DOMException);
-        std::shared_ptr<Node> cloneNode(bool deep);
+        std::string textContent() const
+        {
+            // recursive cat text nodes from children
+        }
+        void textContent(const std::string& context)
+        {
+            // delete all children, add text node
+        }
+        std::shared_ptr<Node> appendChild(std::shared_ptr<Node> newChild) // throw(DOMException);
+        {
+        }
+        std::shared_ptr<Node> insertBefore(std::shared_ptr<Node> newChild, std::shared_ptr<Node> refChild) // throw(DOMException);
+        {
+        }
+        std::shared_ptr<Node> removeChild(std::shared_ptr<Node> oldChild) // throw(DOMException);
+        {
+        }
+        std::shared_ptr<Node> cloneNode(bool deep)
+        {
+        }
         
         virtual ~Node();
     };
 
     struct ElementTraversal
     {
-        Element firstElementChild() const;
-        Element lastElementChild() const;
-        Element nextElementSibling() const;
-        Element previousElementSibling() const;
-        unsigned long childElementCount() const;
+        virtual std::shared_ptr<Element> firstElementChild() const =0;
+        virtual std::shared_ptr<Element> lastElementChild() const =0;
+        virtual std::shared_ptr<Element> nextElementSibling() const =0;
+        virtual std::shared_ptr<Element> previousElementSibling() const =0;
+        unsigned long childElementCount() const =0;
     };
 
     struct Element : Node, ElementTraversal
     {
-        DOMString getAttributeNS(const boost::optional<DOMString>& namespaceURI, const DOMString& localName); // throw(DOMException);  
-        void setAttributeNS(const boost::optional<DOMString>& namespaceURI, const DOMString& qualifiedName, const DOMString& value); // throw(DOMException);
-        DOMString getAttribute(const DOMString& name);
-        void setAttribute(const DOMString& name, const DOMString& value); // throw(DOMException);
+        virtual std::string getAttribute(const QName& name) =0; // throw(DOMException);  
+        virtual std::string getAttribute(const std::string& name) =0;
+        virtual void setAttribute(const QName& name, const std::string& value) =0; // throw(DOMException);
+        virtual void setAttribute(const std::string& name, const DOMString& value) =0; // throw(DOMException);
     };
 
     struct Document : Node
@@ -121,7 +159,7 @@ namespace dom
     };
 
     struct Location
-    {  
+    {
         void assign(const DOMString& iri);
         void reload();
     };
