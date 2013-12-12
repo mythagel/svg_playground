@@ -40,6 +40,8 @@ using namespace xercesc;
 
     try {
         parser->parse(xmlFile);
+
+        std::unique_ptr<DOMDocument> doc{parser->adoptDocument()};
     }
     catch (const XMLException& toCatch) {
         char* message = XMLString::transcode(toCatch.getMessage());
