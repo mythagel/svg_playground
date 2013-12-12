@@ -35,9 +35,6 @@
 #include <map>
 #include <functional>
 
-// blah test
-#include "svg.h"
-
 namespace svg
 {
 
@@ -87,6 +84,21 @@ struct rect : node
 
 all nodes share an api but the implementation differs.
 API to be modeled on svg tiny idl.
+
+
+YEAH YEAH YEAH YEAH.....
+
+Screw that. As implementation details arise the inefficient way seems to be the only way.
+
+SVG can contain unrelated xml content in another xml namspace where it would not otherwise be allowed.
+This makes it extremely difficult to have a typed model of svg when there can be arbitary deviations.
+
+The embedded XML could be used in valid scenarios too (i.e. a model of animations to be read and executed by scripts)
+
+Use xerces DOM.
+
+YEAH YEAH YEAH YEAH.....
+
 
 
 IDEA for inherit.

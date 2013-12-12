@@ -30,6 +30,9 @@
 #include <memory>
 #include <boost/optional.hpp>
 
+namespace experimental
+{
+
 /*
 Restored from history for alternate purpose.
 
@@ -38,37 +41,37 @@ Will form the basis of the C++ DOM model (and in time the js api)
 
 namespace dom
 {
-    // spec requires u16 (std::u16string). Changed to std::string for own purposes.
-    typedef std::string DOMString;
-    struct Node;
-    struct Element;
-    struct Document;
+    struct node_t;
+    struct element_t;
+    struct document_t;
 
-    struct DOMException : std::runtime_error
-    {
-        explicit DOMException(unsigned short code);
-        unsigned short code;
-    };
+    using node = std::shared_ptr<node_t>;
+    using element = std::shared_ptr<element_t>;
+    using document = std::shared_ptr<document_t>;
 
-    enum ExceptionCode : unsigned short
+    struct error : std::runtime_error
     {
-        INDEX_SIZE_ERR                 = 1,
-        DOMSTRING_SIZE_ERR             = 2,
-        HIERARCHY_REQUEST_ERR          = 3,
-        WRONG_DOCUMENT_ERR             = 4,
-        INVALID_CHARACTER_ERR          = 5,
-        NO_DATA_ALLOWED_ERR            = 6,
-        NO_MODIFICATION_ALLOWED_ERR    = 7,
-        NOT_FOUND_ERR                  = 8,
-        NOT_SUPPORTED_ERR              = 9,
-        INUSE_ATTRIBUTE_ERR            = 10,
-        INVALID_STATE_ERR              = 11,
-        SYNTAX_ERR                     = 12,
-        INVALID_MODIFICATION_ERR       = 13,
-        NAMESPACE_ERR                  = 14,
-        INVALID_ACCESS_ERR             = 15,
-        VALIDATION_ERR                 = 16,
-        TYPE_MISMATCH_ERR              = 17
+        enum ErrorCode
+        {
+            INDEX_SIZE_ERR                 = 1,
+            DOMSTRING_SIZE_ERR             = 2,
+            HIERARCHY_REQUEST_ERR          = 3,
+            WRONG_DOCUMENT_ERR             = 4,
+            INVALID_CHARACTER_ERR          = 5,
+            NO_DATA_ALLOWED_ERR            = 6,
+            NO_MODIFICATION_ALLOWED_ERR    = 7,
+            NOT_FOUND_ERR                  = 8,
+            NOT_SUPPORTED_ERR              = 9,
+            INUSE_ATTRIBUTE_ERR            = 10,
+            INVALID_STATE_ERR              = 11,
+            SYNTAX_ERR                     = 12,
+            INVALID_MODIFICATION_ERR       = 13,
+            NAMESPACE_ERR                  = 14,
+            INVALID_ACCESS_ERR             = 15,
+            VALIDATION_ERR                 = 16,
+            TYPE_MISMATCH_ERR              = 17
+        } code;
+        explicit error(ErrorCode code);
     };
 
     struct QName
@@ -77,90 +80,50 @@ namespace dom
         std::string local;
     };
 
-    /*
-        Base class for all DOM nodes.
-        Tracks siblings and children
-        siblings are tracked as a linked list
-    */
-    struct Node
+    struct node_t : std::enable_shared_from_this<node_t>
     {
         QName name;
-        std::shared_ptr<Node> parent;
-        std::shared_ptr<Document> document;
-        struct
-        {
-            std::shared_ptr<Node> next;
-            std::shared_ptr<Node> prev;
-            
-            void reset()
-            {
-                next.reset();
-                prev.reset();
-            }
-        } sibling;
-        struct
-        {
-            std::shared_ptr<Node> first;
-            std::shared_ptr<Node> last;
-            
-            void reset()
-            {
-                next.reset();
-                prev.reset();
-            }
-        } children;
+        document doc;
+        node parent;
+        std::vector<node> children;
         
-        std::string textContent() const
-        {
-            // recursive cat text nodes from children
-        }
-        void textContent(const std::string& context)
-        {
-            // delete all children, add text node
-        }
-        std::shared_ptr<Node> appendChild(std::shared_ptr<Node> newChild) // throw(DOMException);
-        {
-        }
-        std::shared_ptr<Node> insertBefore(std::shared_ptr<Node> newChild, std::shared_ptr<Node> refChild) // throw(DOMException);
-        {
-        }
-        std::shared_ptr<Node> removeChild(std::shared_ptr<Node> oldChild) // throw(DOMException);
-        {
-        }
-        std::shared_ptr<Node> cloneNode(bool deep)
-        {
-        }
+        std::string textContent() const;
+        void textContent(const std::string& context);
+        node appendChild(node newChild); // throw(DOMException);
+        node insertBefore(node newChild, node refChild); // throw(DOMException);
+        node removeChild(node oldChild); // throw(DOMException);
+        virtual node cloneNode(bool deep) =0;
         
-        virtual ~Node();
+        virtual ~node_t();
     };
 
     struct ElementTraversal
     {
-        virtual std::shared_ptr<Element> firstElementChild() const =0;
-        virtual std::shared_ptr<Element> lastElementChild() const =0;
-        virtual std::shared_ptr<Element> nextElementSibling() const =0;
-        virtual std::shared_ptr<Element> previousElementSibling() const =0;
-        unsigned long childElementCount() const =0;
+        virtual element firstElementChild() const =0;
+        virtual element lastElementChild() const =0;
+        virtual element nextElementSibling() const =0;
+        virtual element previousElementSibling() const =0;
+        virtual unsigned long childElementCount() const =0;
     };
 
-    struct Element : Node, ElementTraversal
+    struct element_t : node_t, ElementTraversal
     {
         virtual std::string getAttribute(const QName& name) =0; // throw(DOMException);  
         virtual std::string getAttribute(const std::string& name) =0;
         virtual void setAttribute(const QName& name, const std::string& value) =0; // throw(DOMException);
-        virtual void setAttribute(const std::string& name, const DOMString& value) =0; // throw(DOMException);
+        virtual void setAttribute(const std::string& name, const std::string& value) =0; // throw(DOMException);
     };
 
-    struct Document : Node
+    struct document_t : node_t
     {
-        Element createElementNS(const boost::optional<DOMString>& namespaceURI, const DOMString& qualifiedName); // throw(DOMException);
-        Element documentElement() const;
-        boost::optional<Element> getElementById(const DOMString& elementId);
+        element createElementNS(const boost::optional<std::string>& namespaceURI, const std::string& qualifiedName); // throw(DOMException);
+        element documentElement() const;
+        element getElementById(const std::string& elementId);
     };
 
     struct Location
     {
-        void assign(const DOMString& iri);
+        void assign(const std::string& iri);
         void reload();
     };
 
@@ -170,7 +133,7 @@ namespace dom
         Location location() const;
     };
 
-};
+}
 
 namespace views
 {
@@ -186,22 +149,21 @@ namespace views
         boost::optional<AbstractView> defaultView() const;
     };
 
-};
+}
 
 namespace events
 {
-    typedef dom::DOMString DOMString;
-    typedef dom::DOMException DOMException;
-    typedef dom::Document Document;
-    typedef dom::Element Element;
+    typedef dom::error error;
+    typedef dom::document document;
+    typedef dom::element element;
     struct EventTarget;
     struct EventListener;
     struct Event;    
 
     struct EventTarget
     {
-        void addEventListener(const DOMString& type, std::shared_ptr<EventListener> listener, bool useCapture);
-        void removeEventListener(const DOMString& type, std::shared_ptr<EventListener> listener, bool useCapture);
+        void addEventListener(const std::string& type, std::shared_ptr<EventListener> listener, bool useCapture);
+        void removeEventListener(const std::string& type, std::shared_ptr<EventListener> listener, bool useCapture);
     };
 
     struct EventListener
@@ -214,7 +176,7 @@ namespace events
     {
         EventTarget target() const;
         EventTarget currentTarget() const;
-        DOMString type() const;
+        std::string type() const;
         bool cancelable() const;
         bool defaultPrevented() const;
         void stopPropagation();
@@ -228,36 +190,36 @@ namespace events
 
     struct MouseEvent : UIEvent
     {
-        const long screenX;
-        const long screenY;
-        const long clientX;
-        const long clientY;
-        const unsigned short button;
+        long screenX;
+        long screenY;
+        long clientX;
+        long clientY;
+        unsigned short button;
     };
 
     struct MouseWheelEvent : MouseEvent
     {
-        const long wheelDelta;
+        long wheelDelta;
     };
 
     struct TextEvent : UIEvent
     {
-        const DOMString data;
+        std::string data;
     };
 
     struct KeyboardEvent : UIEvent
     {
-        const DOMString keyIdentifier;
+        std::string keyIdentifier;
     };
 
     struct ProgressEvent : Event
     {
-        const bool lengthComputable;
-        const unsigned long loaded;
-        const unsigned long total;
+        bool lengthComputable;
+        unsigned long loaded;
+        unsigned long total;
     };
 
-};
+}
 
 namespace smil
 {
@@ -273,18 +235,17 @@ namespace smil
 
     struct TimeEvent : Event
     {
-        const long detail;
+        long detail;
     };
 
-};
+}
 
 namespace svg
 {
-    typedef dom::DOMString DOMString;
-    typedef dom::DOMException DOMException;
-    typedef dom::Document Document;
-    typedef dom::Element Element;
-    typedef dom::Node Node;
+    typedef dom::error error;
+    typedef dom::document document;
+    typedef dom::element element;
+    typedef dom::node node;
     typedef events::Event Event;
     typedef events::EventListener EventListener;
     typedef events::EventTarget EventTarget;
@@ -313,7 +274,7 @@ namespace svg
         SVG_MATRIX_NOT_INVERTABLE  = 2
     };
 
-    struct SVGDocument : Document, EventTarget
+    struct SVGDocument : dom::document_t, EventTarget
     {
     };
 
@@ -326,36 +287,36 @@ namespace svg
 
     struct TraitAccess
     {
-        DOMString getTrait(const DOMString& name); // throw(DOMException);
-        DOMString getTraitNS(const DOMString& namespaceURI, const DOMString& name); // throw(DOMException);
-        float getFloatTrait(const DOMString& name); // throw(DOMException);
-        std::vector<float> getFloatListTrait(const DOMString& name); // throw(DOMException);
-        SVGMatrix getMatrixTrait(const DOMString& name); // throw(DOMException);
-        boost::optional<SVGRect> getRectTrait(const DOMString& name); // throw(DOMException);
-        SVGPath getPathTrait(const DOMString& name); // throw(DOMException);
-        boost::optional<SVGRGBColor> getRGBColorTrait(const DOMString& name); // throw(DOMException);
-        DOMString getPresentationTrait(const DOMString& name); // throw(DOMException);
-        DOMString getPresentationTraitNS(const DOMString& namespaceURI, const DOMString& name); // throw(DOMException);
-        float getFloatPresentationTrait(const DOMString& name); // throw(DOMException);
-        std::vector<float> getFloatListPresentationTrait(const DOMString& name); // throw(DOMException);
-        SVGMatrix getMatrixPresentationTrait(const DOMString& name); // throw(DOMException);
-        boost::optional<SVGRect> getRectPresentationTrait(const DOMString& name); // throw(DOMException);
-        SVGPath getPathPresentationTrait(const DOMString& name); // throw(DOMException);
-        boost::optional<SVGRGBColor> getRGBColorPresentationTrait(const DOMString& name); // throw(DOMException);
-        void setTrait(const DOMString& name, const DOMString& value); // throw(DOMException);
-        void setTraitNS(const DOMString& namespaceURI, const DOMString& name, const DOMString& value); // throw(DOMException);
-        void setFloatTrait(const DOMString& name, float value); // throw(DOMException);
-        void setFloatListTrait(const DOMString& name, const std::vector<float>& value); // throw(DOMException);
-        void setMatrixTrait(const DOMString& name, const SVGMatrix& matrix); // throw(DOMException);
-        void setRectTrait(const DOMString& name, const SVGRect& rect); // throw(DOMException);
-        void setPathTrait(const DOMString& name, const SVGPath& path); // throw(DOMException);
-        void setRGBColorTrait(const DOMString& name, const SVGRGBColor& color); // throw(DOMException);
+        std::string getTrait(const std::string& name); // throw(DOMException);
+        std::string getTraitNS(const std::string& namespaceURI, const std::string& name); // throw(DOMException);
+        float getFloatTrait(const std::string& name); // throw(DOMException);
+        std::vector<float> getFloatListTrait(const std::string& name); // throw(DOMException);
+        SVGMatrix getMatrixTrait(const std::string& name); // throw(DOMException);
+        boost::optional<SVGRect> getRectTrait(const std::string& name); // throw(DOMException);
+        SVGPath getPathTrait(const std::string& name); // throw(DOMException);
+        boost::optional<SVGRGBColor> getRGBColorTrait(const std::string& name); // throw(DOMException);
+        std::string getPresentationTrait(const std::string& name); // throw(DOMException);
+        std::string getPresentationTraitNS(const std::string& namespaceURI, const std::string& name); // throw(DOMException);
+        float getFloatPresentationTrait(const std::string& name); // throw(DOMException);
+        std::vector<float> getFloatListPresentationTrait(const std::string& name); // throw(DOMException);
+        SVGMatrix getMatrixPresentationTrait(const std::string& name); // throw(DOMException);
+        boost::optional<SVGRect> getRectPresentationTrait(const std::string& name); // throw(DOMException);
+        SVGPath getPathPresentationTrait(const std::string& name); // throw(DOMException);
+        boost::optional<SVGRGBColor> getRGBColorPresentationTrait(const std::string& name); // throw(DOMException);
+        void setTrait(const std::string& name, const std::string& value); // throw(DOMException);
+        void setTraitNS(const std::string& namespaceURI, const std::string& name, const std::string& value); // throw(DOMException);
+        void setFloatTrait(const std::string& name, float value); // throw(DOMException);
+        void setFloatListTrait(const std::string& name, const std::vector<float>& value); // throw(DOMException);
+        void setMatrixTrait(const std::string& name, const SVGMatrix& matrix); // throw(DOMException);
+        void setRectTrait(const std::string& name, const SVGRect& rect); // throw(DOMException);
+        void setPathTrait(const std::string& name, const SVGPath& path); // throw(DOMException);
+        void setRGBColorTrait(const std::string& name, const SVGRGBColor& color); // throw(DOMException);
     };
 
-    struct SVGElement : Element, EventTarget, TraitAccess
+    struct SVGElement : dom::element_t, EventTarget, TraitAccess
     {
-        boost::optional<DOMString> id() const;
-        void id(const DOMString& id) const;
+        boost::optional<std::string> id() const;
+        void id(const std::string& id) const;
     };
 
     struct SVGLocatableElement : SVGElement, SVGLocatable
@@ -368,8 +329,8 @@ namespace svg
 
     struct SVGElementInstance : EventTarget
     {
-        SVGElement correspondingElement() const;
-        SVGUseElement correspondingUseElement() const;
+        SVGElement* correspondingElement() const;
+        SVGUseElement* correspondingUseElement() const;
     };
 
     struct SVGTimedElement : SVGElement, smil::ElementTimeControl
@@ -493,8 +454,8 @@ namespace svg
     struct AsyncURLStatus
     {
         const bool success;
-        const boost::optional<DOMString> contentType;
-        const boost::optional<DOMString> content;
+        const boost::optional<std::string> contentType;
+        const boost::optional<std::string> content;
     };
 
     struct AsyncStatusCallback
@@ -506,11 +467,13 @@ namespace svg
     struct SVGGlobal
     {
        SVGTimer createTimer(long initialInterval, long repeatInterval);
-       void getURL(const DOMString& iri, std::shared_ptr<AsyncStatusCallback> callback);
-       void postURL(const DOMString& iri, const DOMString& data, std::shared_ptr<AsyncStatusCallback> callback, const DOMString& type, const DOMString& encoding);
-       boost::optional<Node> parseXML(const DOMString& data, Document contextDoc);
+       void getURL(const std::string& iri, std::shared_ptr<AsyncStatusCallback> callback);
+       void postURL(const std::string& iri, const std::string& data, std::shared_ptr<AsyncStatusCallback> callback, const std::string& type, const std::string& encoding);
+       node parseXML(const std::string& data, document contextDoc);
     };
 
-};
+}
+
+}
 
 #endif /* SVG_H_ */
