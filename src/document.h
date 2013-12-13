@@ -503,11 +503,17 @@ namespace paint
     };
 }
 
+struct bidi_attributes
+{
+    bidi::direction direction;
+    bidi::unicode_bidi unicode_bidi;
+};
+
 struct document
 {
     // TODO wrappers for optional, default values and inherit.
-    bidi::direction direction;
-    bidi::unicode_bidi unicode_bidi;
+    bidi_attributes bidi;
+
     text::display_align display_align;
     text::line_increment line_increment;
 
