@@ -135,17 +135,17 @@ struct character_t : node_t
         throw std::runtime_error("character node cannot have children.");
     }
 
-    virtual node insert(const node& child, const node& ref) override
+    virtual node insert(const node&, const node&) override
     {
         throw std::runtime_error("character node cannot have children.");
     }
 
-    virtual node erase(const node& child) override
+    virtual node erase(const node&) override
     {
         throw std::runtime_error("character node cannot have children.");
     }
 
-    virtual node clone(bool)
+    virtual node clone(bool) override
     {
         auto dup = std::make_shared<character_t>(*this);
         dup->parent.reset();
@@ -197,6 +197,8 @@ struct basic_element_t : element_t
             dup->children.clear();
             return dup;
         }
+
+        return dup;
     }
 
     virtual ~basic_element_t()
@@ -206,10 +208,151 @@ struct basic_element_t : element_t
 
 }
 
+dom::qualified_name SVG = {"http://www.w3.org/2000/svg", "svg"};
+dom::qualified_name DESC = {"http://www.w3.org/2000/svg", "desc"};
+
+struct svg_element_t : dom::basic_element_t
+{
+    svg_element_t()
+     : basic_element_t(SVG)
+    {
+    }
+
+    virtual dom::node clone(bool deep) override
+    {
+        auto dup = std::make_shared<svg_element_t>(*this);
+        dup->parent.reset();
+
+        if(deep)
+        {
+            for(auto& child : dup->children)
+                child = child->clone(deep);
+        }
+        else
+        {
+            dup->children.clear();
+            return dup;
+        }
+
+        return dup;
+    }
+
+    virtual ~svg_element_t()
+    {
+    }
+};
+
+namespace network
+{
+struct uri
+{
+};
+
+}
+
+struct svg_CoreCommon_attr
+{
+    boost::optional<std::string> id;
+    boost::optional<network::uri> base;
+    boost::optional<std::string> lang;
+    boost::optional<std::string> _class;
+    boost::optional<std::vector<std::string>> role;
+    boost::optional<std::vector<std::string>> rel;
+    boost::optional<std::vector<std::string>> rev;
+    boost::optional<std::vector<std::string>> _typeof;
+    boost::optional<std::string> content;
+    boost::optional<std::string> datatype;
+    boost::optional<std::string> resource;
+    boost::optional<std::vector<std::string>> about;
+    boost::optional<std::vector<std::string>> property;
+};
+
+struct svg_Core_attr
+{
+    svg_CoreCommon_attr common;
+
+    enum class space_t
+    {
+        _default,
+        preserve
+    };
+
+    boost::optional<space_t> space;
+};
+
+struct svg_Conditional_attr
+{
+    boost::optional<std::vector<network::uri>> requiredFeatures;
+    boost::optional<std::vector<network::uri>> requiredExtensions;
+    boost::optional<std::vector<std::string>> requiredFormats;
+    boost::optional<std::vector<std::string>> requiredFonts;
+    boost::optional<std::vector<std::string>> systemLanguage;
+};
+
+struct svg_Media_attr
+{
+    enum class display_t
+    {
+        _inline,
+        block,
+        list_item,
+        run_in,
+        compact,
+        marker,
+        table,
+        inline_table,
+        table_row_group,
+        table_header_group,
+        table_footer_group,
+        table_row,
+        table_column_group,
+        table_column,
+        table_cell,
+        table_caption,
+        none,
+        inherit
+    };
+    boost::optional<display_t> display;
+
+    enum class visibility_t
+    {
+        visible,
+        hidden,
+        inherit
+    };
+    boost::optional<visibility_t> visibility;
+    // incomplete
+};
+
+struct desc_element_t : dom::element_t
+{
+    std::string description;
+    std::unique_ptr<svg_Core_attr> core;
+    std::unique_ptr<svg_Conditional_attr> conditional;
+
+    desc_element_t()
+     : element_t(DESC)
+    {
+    }
+
+    virtual ~desc_element_t()
+    {
+    }
+};
+
+dom::element default_construct_element(const dom::qualified_name& name)
+{
+    if(name == SVG)
+        return std::make_shared<svg_element_t>();
+    return std::make_shared<dom::basic_element_t>(name);
+}
+
 struct parser : expat::parser<parser>
 {
     std::stack<dom::node> stack;
     dom::node root;
+    std::function<dom::element(const dom::qualified_name&)> construct_element;
+
     void startNamespace(const std::string&, const std::string&)
 	{
 	}
@@ -220,14 +363,14 @@ struct parser : expat::parser<parser>
 	void startElement(const expat::qname& name, const std::vector<std::pair<expat::qname, std::string>>& attributes)
 	{
         // based on the qualified element name could construct different subclasses of element_t
-        dom::element element = std::make_shared<dom::basic_element_t>(dom::qualified_name{ name.local, name.prefix });
+        dom::element element = construct_element({ name.local, name.prefix });
 
 	    for(auto& attr : attributes)
             element->set_attribute({ attr.first.local, attr.first.prefix }, attr.second);
 
         stack.push(element);
 	}
-	void endElement(const expat::qname& name)
+    void endElement(const expat::qname&)
 	{
         auto node = stack.top();
         stack.pop();
@@ -249,22 +392,27 @@ struct parser : expat::parser<parser>
 	}
 };
 
-std::ostream& operator<<(std::ostream& os, const dom::node& node)
+void write(std::ostream& os, const dom::node& node, int level = 0)
 {
-    os << "{\n";
+    auto indent = std::string(level, ' ');
+
     if(auto element = std::dynamic_pointer_cast<dom::element_t>(node))
     {
-        os << element->name.ns << ":" << element->name.local << "\n";
+        os << indent << element->name.ns << ":" << element->name.local << "\n";
         // TODO attributes...
     }
     else if(auto cdata = std::dynamic_pointer_cast<dom::character_t>(node))
     {
-        os << "char: '" << cdata->data << "'\n";
+        os << indent << "'" << cdata->data << "'\n";
     }
 
     for(auto& child : node->children)
-        os << "child: " << child << "\n";
-    os << "}\n";
+        write(os, child, level+1);
+}
+
+std::ostream& operator<<(std::ostream& os, const dom::node& node)
+{
+    write(os, node);
     return os;
 }
 
@@ -276,6 +424,7 @@ int main()
     std::string s{std::istreambuf_iterator<char>{f}, std::istreambuf_iterator<char>()};
     
     parser p;
+    p.construct_element = default_construct_element;
     p.Parse(s);
 
     auto root = p.root;
