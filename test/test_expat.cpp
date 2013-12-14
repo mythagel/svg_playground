@@ -11,8 +11,17 @@
 #include <memory>
 #include <algorithm>
 #include <boost/optional.hpp>
+#include <boost/variant.hpp>
 #include <utility>
 #include <stdexcept>
+#include "colour.h"
+
+namespace network
+{
+struct uri
+{
+};
+}
 
 namespace dom
 {
@@ -108,8 +117,6 @@ struct element_t : node_t
     {
     }
 
-    // interface for attribute iterators.
-    // read/write still needs to be virtual.
     virtual boost::optional<std::string> get_attribute(const qualified_name& name) const =0;
     virtual void set_attribute(const qualified_name& name, const boost::optional<std::string>& value) =0;
 
@@ -208,8 +215,11 @@ struct basic_element_t : element_t
 
 }
 
-dom::qualified_name SVG = {"http://www.w3.org/2000/svg", "svg"};
-dom::qualified_name DESC = {"http://www.w3.org/2000/svg", "desc"};
+namespace svg
+{
+
+dom::qualified_name SVG = {"svg", "http://www.w3.org/2000/svg"};
+dom::qualified_name DESC = {"desc", "http://www.w3.org/2000/svg"};
 
 struct svg_element_t : dom::basic_element_t
 {
@@ -242,15 +252,10 @@ struct svg_element_t : dom::basic_element_t
     }
 };
 
-namespace network
+namespace attr
 {
-struct uri
-{
-};
 
-}
-
-struct svg_CoreCommon_attr
+struct core_common_t
 {
     boost::optional<std::string> id;
     boost::optional<network::uri> base;
@@ -267,9 +272,9 @@ struct svg_CoreCommon_attr
     boost::optional<std::vector<std::string>> property;
 };
 
-struct svg_Core_attr
+struct core_t
 {
-    svg_CoreCommon_attr common;
+    core_common_t common;
 
     enum class space_t
     {
@@ -280,7 +285,7 @@ struct svg_Core_attr
     boost::optional<space_t> space;
 };
 
-struct svg_Conditional_attr
+struct conditional_t
 {
     boost::optional<std::vector<network::uri>> requiredFeatures;
     boost::optional<std::vector<network::uri>> requiredExtensions;
@@ -289,7 +294,7 @@ struct svg_Conditional_attr
     boost::optional<std::vector<std::string>> systemLanguage;
 };
 
-struct svg_Media_attr
+struct media_t
 {
     enum class display_t
     {
@@ -321,18 +326,149 @@ struct svg_Media_attr
         inherit
     };
     boost::optional<visibility_t> visibility;
-    // incomplete
+
+    enum class image_rendering_t
+    {
+        _auto,
+        optimizeSpeed,
+        optimizeQuality,
+        inherit
+    };
+    boost::optional<image_rendering_t> image_rendering;
+
+    enum class pointer_events_t
+    {
+        visiblePainted,
+        visibleFill,
+        visibleStroke,
+        visible,
+        painted,
+        fill,
+        stroke,
+        all,
+        none,
+        inherit
+    };
+    boost::optional<pointer_events_t> pointer_events;
+
+    enum class shape_rendering_t
+    {
+        _auto,
+        optimizeSpeed,
+        crispEdges,
+        geometricPrecision,
+        inherit
+    };
+    boost::optional<shape_rendering_t> shape_rendering;
+
+    enum class text_rendering_t
+    {
+        _auto,
+        optimizeSpeed,
+        optimizeLegibility,
+        geometricPrecision,
+        inherit
+    };
+    boost::optional<text_rendering_t> text_rendering;
+
+    enum class buffered_rendering_t
+    {
+        _auto,
+        dynamic,
+        _static,
+        inherit
+    };
+    boost::optional<buffered_rendering_t> buffered_rendering;
+
+    enum class audio_level_enum_t
+    {
+        inherit
+    };
+    using audio_level_t = boost::variant<audio_level_enum_t, float>;
+    boost::optional<audio_level_t> audio_level;
+
+    enum class viewport_fill_enum_t
+    {
+        inherit,
+        none
+    };
+    using viewport_fill_t = boost::variant<viewport_fill_enum_t, svg::types::colour>;
+    boost::optional<viewport_fill_t> viewport_fill;
+
+    enum class viewport_fill_opacity_enum_t
+    {
+        inherit
+    };
+    using viewport_fill_opacity_t = boost::variant<viewport_fill_opacity_enum_t, float>;
+    boost::optional<viewport_fill_opacity_t> viewport_fill_opacity;
 };
+
+}
 
 struct desc_element_t : dom::element_t
 {
     std::string description;
-    std::unique_ptr<svg_Core_attr> core;
-    std::unique_ptr<svg_Conditional_attr> conditional;
+    std::unique_ptr<attr::core_t> core;
+    std::unique_ptr<attr::conditional_t> conditional;
+    std::unique_ptr<attr::media_t> media;
 
     desc_element_t()
      : element_t(DESC)
     {
+    }
+
+    desc_element_t(const desc_element_t& o)
+        : element_t(DESC), description(o.description)/*, todo copy ptrs*/
+    {
+    }
+
+    desc_element_t(desc_element_t&& o) = default;
+
+    virtual dom::node append(const dom::node& child) override
+    {
+        if(std::dynamic_pointer_cast<dom::character_t>(child))
+            return element_t::append(child);
+        throw std::runtime_error("desc node cannot have non-text children.");
+    }
+
+    virtual dom::node insert(const dom::node& child, const dom::node& ref) override
+    {
+        if(std::dynamic_pointer_cast<dom::character_t>(child))
+            return element_t::insert(child, ref);
+        throw std::runtime_error("desc node cannot have non-text children.");
+    }
+
+    virtual dom::node erase(const dom::node& child) override
+    {
+        return element_t::erase(child);
+    }
+
+    virtual dom::node clone(bool deep) override
+    {
+        auto dup = std::make_shared<desc_element_t>(*this);
+        dup->parent.reset();
+
+        if(deep)
+        {
+            for(auto& child : dup->children)
+                child = child->clone(deep);
+        }
+        else
+        {
+            dup->children.clear();
+            return dup;
+        }
+
+        return dup;
+    }
+
+    virtual boost::optional<std::string> get_attribute(const dom::qualified_name& name) const override
+    {
+
+    }
+    virtual void set_attribute(const dom::qualified_name& name, const boost::optional<std::string>& value) override
+    {
+
     }
 
     virtual ~desc_element_t()
@@ -340,10 +476,14 @@ struct desc_element_t : dom::element_t
     }
 };
 
+}
+
 dom::element default_construct_element(const dom::qualified_name& name)
 {
-    if(name == SVG)
-        return std::make_shared<svg_element_t>();
+    if(name == svg::SVG)
+        return std::make_shared<svg::svg_element_t>();
+    else if(name == svg::DESC)
+        return std::make_shared<svg::desc_element_t>();
     return std::make_shared<dom::basic_element_t>(name);
 }
 
@@ -399,7 +539,7 @@ void write(std::ostream& os, const dom::node& node, int level = 0)
     if(auto element = std::dynamic_pointer_cast<dom::element_t>(node))
     {
         os << indent << element->name.ns << ":" << element->name.local << "\n";
-        // TODO attributes...
+        // no interface to iterate over attributes (and none needed)...
     }
     else if(auto cdata = std::dynamic_pointer_cast<dom::character_t>(node))
     {
