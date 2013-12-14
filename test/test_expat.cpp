@@ -464,7 +464,9 @@ struct desc_element_t : dom::element_t
 
     virtual boost::optional<std::string> get_attribute(const dom::qualified_name& name) const override
     {
-
+        /* need a good way to map variable attributes to access by name.
+         * something that associates the (potential) value with a name
+         * so it can be get and set. */
     }
     virtual void set_attribute(const dom::qualified_name& name, const boost::optional<std::string>& value) override
     {
