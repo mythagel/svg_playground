@@ -14,7 +14,9 @@
 #include <boost/variant.hpp>
 #include <utility>
 #include <stdexcept>
+#include <sstream>
 #include "colour.h"
+#include "make_unique.h"
 
 namespace network
 {
@@ -243,22 +245,72 @@ struct optional_typed_attribute_ref : typed_attribute
 {
     std::reference_wrapper<boost::optional<T>> value;
 
+    optional_typed_attribute_ref(boost::optional<T>& value)
+     : value(std::ref(value))
+    {
+    }
+
     virtual boost::optional<std::string> get() const override
     {
         auto& v = value.get();
-        using std::to_string;
-        return v ? boost::make_optional(to_string(*v)) : boost::none;
+        if(!v)
+            return boost::none;
+        std::ostringstream s;
+        s << *v;
+        return { s.str() };
     }
-    virtual void set(const boost::optional<std::string>& value) override
+    virtual void set(const boost::optional<std::string>& new_value) override
     {
         auto& v = value.get();
-        v = T{value};
+        if(new_value)
+        {
+            std::istringstream s(*new_value);
+            if(!v)
+                v = boost::make_optional(T{});
+            s >> *v;
+        }
+        else
+        {
+            v = boost::none;
+        }
     }
 
     virtual ~optional_typed_attribute_ref()
     {
     }
 };
+
+template <>
+struct optional_typed_attribute_ref<std::string> : typed_attribute
+{
+    std::reference_wrapper<boost::optional<std::string>> value;
+
+    optional_typed_attribute_ref(boost::optional<std::string>& value)
+     : value(std::ref(value))
+    {
+    }
+
+    virtual boost::optional<std::string> get() const override
+    {
+        return value;
+    }
+    virtual void set(const boost::optional<std::string>& new_value) override
+    {
+        value.get() = new_value;
+    }
+
+    virtual ~optional_typed_attribute_ref()
+    {
+    }
+};
+
+template<typename T>
+auto make_ref(boost::optional<T>& value) -> std::unique_ptr<optional_typed_attribute_ref<T>>
+{
+    return make_unique<optional_typed_attribute_ref<T>>(value);
+}
+
+using attribute_map_t = std::map<std::string, std::unique_ptr<typed_attribute>>;
 
 struct core_common_t
 {
@@ -276,6 +328,23 @@ struct core_common_t
     boost::optional<std::vector<std::string>> about;
     boost::optional<std::vector<std::string>> property;
 };
+
+void map_attributes(core_common_t& attr, attribute_map_t& attrs)
+{
+    attrs.emplace("id", make_ref(attr.id));
+//    attrs.emplace("base", make_ref(attr.base));
+//    attrs.emplace("lang", make_ref(attr.lang));
+//    attrs.emplace("class", make_ref(attr._class));
+//    attrs.emplace("role", make_ref(attr.role));
+//    attrs.emplace("rel", make_ref(attr.rel));
+//    attrs.emplace("rev", make_ref(attr.rev));
+//    attrs.emplace("typeof", make_ref(attr._typeof));
+//    attrs.emplace("content", make_ref(attr.content));
+//    attrs.emplace("datatype", make_ref(attr.datatype));
+//    attrs.emplace("resource", make_ref(attr.resource));
+//    attrs.emplace("about", make_ref(attr.about));
+//    attrs.emplace("property", make_ref(attr.property));
+}
 
 struct core_t
 {
@@ -452,7 +521,7 @@ struct desc_element_t : dom::element_t
     std::unique_ptr<attr::conditional_t> conditional;
     std::unique_ptr<attr::media_t> media;
 
-    std::vector<std::unique_ptr<typed_attribute>> attributes;
+    std::vector<std::unique_ptr<attr::typed_attribute>> attributes;
 
     desc_element_t()
     {
