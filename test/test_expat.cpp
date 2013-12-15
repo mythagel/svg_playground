@@ -110,13 +110,11 @@ using element = std::shared_ptr<element_t>;
 
 struct element_t : node_t
 {
-    qualified_name name;
-
-    element_t(const qualified_name& name)
-     : name(name)
+    element_t()
     {
     }
 
+    virtual qualified_name name() const =0;
     virtual boost::optional<std::string> get_attribute(const qualified_name& name) const =0;
     virtual void set_attribute(const qualified_name& name, const boost::optional<std::string>& value) =0;
 
@@ -166,11 +164,17 @@ struct character_t : node_t
 
 struct basic_element_t : element_t
 {
+    qualified_name element_name;
     std::map<qualified_name, std::string> attributes;
 
     basic_element_t(const qualified_name& name)
-     : element_t(name)
+     : element_name(name)
     {
+    }
+
+    virtual qualified_name name() const override
+    {
+        return element_name;
     }
 
     virtual boost::optional<std::string> get_attribute(const qualified_name& name) const override
@@ -218,42 +222,43 @@ struct basic_element_t : element_t
 namespace svg
 {
 
-dom::qualified_name SVG = {"svg", "http://www.w3.org/2000/svg"};
-dom::qualified_name DESC = {"desc", "http://www.w3.org/2000/svg"};
-
-struct svg_element_t : dom::basic_element_t
+namespace attr
 {
-    svg_element_t()
-     : basic_element_t(SVG)
-    {
-    }
 
-    virtual dom::node clone(bool deep) override
-    {
-        auto dup = std::make_shared<svg_element_t>(*this);
-        dup->parent.reset();
-
-        if(deep)
-        {
-            for(auto& child : dup->children)
-                child = child->clone(deep);
-        }
-        else
-        {
-            dup->children.clear();
-            return dup;
-        }
-
-        return dup;
-    }
-
-    virtual ~svg_element_t()
+/* Generic string access to typed (member variable)
+ * attributes */
+struct typed_attribute
+{
+    virtual boost::optional<std::string> get() const = 0;
+    virtual void set(const boost::optional<std::string>& value) =0;
+    virtual ~typed_attribute()
     {
     }
 };
 
-namespace attr
+/* Typed attribute whose storage is a reference to an
+ * optional attribute elsewhere. */
+template <typename T>
+struct optional_typed_attribute_ref : typed_attribute
 {
+    std::reference_wrapper<boost::optional<T>> value;
+
+    virtual boost::optional<std::string> get() const override
+    {
+        auto& v = value.get();
+        using std::to_string;
+        return v ? boost::make_optional(to_string(*v)) : boost::none;
+    }
+    virtual void set(const boost::optional<std::string>& value) override
+    {
+        auto& v = value.get();
+        v = T{value};
+    }
+
+    virtual ~optional_typed_attribute_ref()
+    {
+    }
+};
 
 struct core_common_t
 {
@@ -405,6 +410,40 @@ struct media_t
 
 }
 
+dom::qualified_name SVG = {"svg", "http://www.w3.org/2000/svg"};
+dom::qualified_name DESC = {"desc", "http://www.w3.org/2000/svg"};
+
+struct svg_element_t : dom::basic_element_t
+{
+    svg_element_t()
+     : basic_element_t(SVG)
+    {
+    }
+
+    virtual dom::node clone(bool deep) override
+    {
+        auto dup = std::make_shared<svg_element_t>(*this);
+        dup->parent.reset();
+
+        if(deep)
+        {
+            for(auto& child : dup->children)
+                child = child->clone(deep);
+        }
+        else
+        {
+            dup->children.clear();
+            return dup;
+        }
+
+        return dup;
+    }
+
+    virtual ~svg_element_t()
+    {
+    }
+};
+
 struct desc_element_t : dom::element_t
 {
     std::string description;
@@ -413,16 +452,20 @@ struct desc_element_t : dom::element_t
     std::unique_ptr<attr::media_t> media;
 
     desc_element_t()
-     : element_t(DESC)
     {
     }
 
     desc_element_t(const desc_element_t& o)
-        : element_t(DESC), description(o.description)/*, todo copy ptrs*/
+     : description(o.description)/*, todo copy ptrs*/
     {
     }
 
     desc_element_t(desc_element_t&& o) = default;
+
+    virtual dom::qualified_name name() const override
+    {
+        return DESC;
+    }
 
     virtual dom::node append(const dom::node& child) override
     {
@@ -540,7 +583,7 @@ void write(std::ostream& os, const dom::node& node, int level = 0)
 
     if(auto element = std::dynamic_pointer_cast<dom::element_t>(node))
     {
-        os << indent << element->name.ns << ":" << element->name.local << "\n";
+        os << indent << element->name().ns << ":" << element->name().local << "\n";
         // no interface to iterate over attributes (and none needed)...
     }
     else if(auto cdata = std::dynamic_pointer_cast<dom::character_t>(node))
