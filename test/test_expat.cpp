@@ -447,9 +447,12 @@ struct svg_element_t : dom::basic_element_t
 struct desc_element_t : dom::element_t
 {
     std::string description;
+
     std::unique_ptr<attr::core_t> core;
     std::unique_ptr<attr::conditional_t> conditional;
     std::unique_ptr<attr::media_t> media;
+
+    std::vector<std::unique_ptr<typed_attribute>> attributes;
 
     desc_element_t()
     {
