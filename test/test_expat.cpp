@@ -23,6 +23,16 @@ namespace network
 struct uri
 {
 };
+
+std::ostream& operator<<(std::ostream& os, const network::uri&)
+{
+    return os;
+}
+std::istream& operator>>(std::istream& is, network::uri&)
+{
+    return is;
+}
+
 }
 
 namespace dom
@@ -223,7 +233,6 @@ struct basic_element_t : element_t
 
 namespace svg
 {
-
 namespace attr
 {
 
@@ -266,7 +275,7 @@ struct optional_typed_attribute_ref : typed_attribute
         {
             std::istringstream s(*new_value);
             if(!v)
-                v = boost::make_optional(T{});
+                v = boost::make_optional(T());
             s >> *v;
         }
         else
@@ -312,38 +321,182 @@ auto make_ref(boost::optional<T>& value) -> std::unique_ptr<optional_typed_attri
 
 using attribute_map_t = std::map<std::string, std::unique_ptr<typed_attribute>>;
 
+struct stringlist_t
+{
+    std::vector<std::string> data;
+};
+
+std::ostream& operator<<(std::ostream& os, const stringlist_t& list)
+{
+    std::copy(begin(list.data), end(list.data), std::ostream_iterator<std::string>(os, " "));
+    return os;
+}
+std::istream& operator>>(std::istream& is, stringlist_t& list)
+{
+    list.data = std::vector<std::string>(std::istream_iterator<std::string>{is}, std::istream_iterator<std::string>{});
+    return is;
+}
+
+struct bidi_t
+{
+    enum class direction_t
+    {
+        ltr,
+        rtl,
+        inherit
+    };
+    boost::optional<direction_t> direction;
+
+    enum class unicode_bidi_t
+    {
+        normal,
+        embed,
+        bidi_override,
+        inherit
+    };
+    boost::optional<unicode_bidi_t> unicode_bidi;
+};
+
+struct media_t;
+struct properties_t
+{
+    std::unique_ptr<bidi_t> bidi;
+
+    enum class display_align_t
+    {
+        _auto,
+        before,
+        center,
+        after,
+        inherit
+    };
+    boost::optional<display_align_t> display_align;
+
+    enum class line_increment_enum_t
+    {
+        _auto,
+        inherit
+    };
+    using line_increment_t = boost::variant<line_increment_enum_t, float>;
+    boost::optional<line_increment_t> line_increment;
+
+    enum class stop_colour_enum_t
+    {
+        inherit
+    };
+    using stop_colour_t = boost::variant<stop_colour_enum_t, svg::types::colour>;
+    boost::optional<stop_colour_t> stop_colour;
+
+    enum class stop_opacity_enum_t
+    {
+        inherit
+    };
+    using stop_opacity_t = boost::variant<stop_opacity_enum_t, float>;
+    boost::optional<stop_opacity_t> stop_opacity;
+
+    std::unique_ptr<attr::media_t> media;
+
+    enum class fill_opacity_enum_t
+    {
+        inherit
+    };
+    using fill_opacity_t = boost::variant<fill_opacity_enum_t, float>;
+    boost::optional<fill_opacity_t> fill_opacity;
+
+    enum class stroke_opacity_enum_t
+    {
+        inherit
+    };
+    using stroke_opacity_t = boost::variant<stroke_opacity_enum_t, float>;
+    boost::optional<stroke_opacity_t> stroke_opacity;
+
+    enum class paint_enum_t
+    {
+        none,
+        currentColor,
+        inherit
+    };
+    enum class system_paint_t
+    {
+        ActiveBorder,
+        ActiveCaption,
+        AppWorkspace,
+        Background,
+        ButtonFace,
+        ButtonHighlight,
+        ButtonShadow,
+        ButtonText,
+        CaptionText,
+        GrayText,
+        Highlight,
+        HighlightText,
+        InactiveBorder,
+        InactiveCaption,
+        InactiveCaptionText,
+        InfoBackground,
+        InfoText,
+        Menu,
+        MenuText,
+        Scrollbar,
+        ThreeDDarkShadow,
+        ThreeDFace,
+        ThreeDHighlight,
+        ThreeDLightShadow,
+        ThreeDShadow,
+        Window,
+        WindowFrame,
+        WindowText
+    };
+
+    using paint_t = boost::variant<paint_enum_t, svg::types::colour, network::uri/*<FuncIRI> [ none | currentColor | <color>]*/, system_paint_t>;
+
+    boost::optional<paint_t> fill;
+
+    enum class fill_rule_t
+    {
+        inherit,
+        nonzero,
+        evenodd
+    };
+    boost::optional<fill_rule_t> fill_rule;
+
+    boost::optional<paint_t> stroke;
+
+    // TODO listof<T> as T (comma-wsp T)*
+};
+
 struct core_common_t
 {
     boost::optional<std::string> id;
     boost::optional<network::uri> base;
     boost::optional<std::string> lang;
     boost::optional<std::string> _class;
-    boost::optional<std::vector<std::string>> role;
-    boost::optional<std::vector<std::string>> rel;
-    boost::optional<std::vector<std::string>> rev;
-    boost::optional<std::vector<std::string>> _typeof;
+    boost::optional<stringlist_t> role;
+    boost::optional<stringlist_t> rel;
+    boost::optional<stringlist_t> rev;
+    boost::optional<stringlist_t> _typeof;
     boost::optional<std::string> content;
     boost::optional<std::string> datatype;
     boost::optional<std::string> resource;
-    boost::optional<std::vector<std::string>> about;
-    boost::optional<std::vector<std::string>> property;
+    boost::optional<stringlist_t> about;
+    boost::optional<stringlist_t> property;
 };
 
 void map_attributes(core_common_t& attr, attribute_map_t& attrs)
 {
     attrs.emplace("id", make_ref(attr.id));
-//    attrs.emplace("base", make_ref(attr.base));
-//    attrs.emplace("lang", make_ref(attr.lang));
-//    attrs.emplace("class", make_ref(attr._class));
-//    attrs.emplace("role", make_ref(attr.role));
-//    attrs.emplace("rel", make_ref(attr.rel));
-//    attrs.emplace("rev", make_ref(attr.rev));
-//    attrs.emplace("typeof", make_ref(attr._typeof));
-//    attrs.emplace("content", make_ref(attr.content));
-//    attrs.emplace("datatype", make_ref(attr.datatype));
-//    attrs.emplace("resource", make_ref(attr.resource));
-//    attrs.emplace("about", make_ref(attr.about));
-//    attrs.emplace("property", make_ref(attr.property));
+    attrs.emplace("base", make_ref(attr.base));
+    attrs.emplace("lang", make_ref(attr.lang));
+    attrs.emplace("class", make_ref(attr._class));
+    attrs.emplace("role", make_ref(attr.role));
+    attrs.emplace("rel", make_ref(attr.rel));
+    attrs.emplace("rev", make_ref(attr.rev));
+    attrs.emplace("typeof", make_ref(attr._typeof));
+    attrs.emplace("content", make_ref(attr.content));
+    attrs.emplace("datatype", make_ref(attr.datatype));
+    attrs.emplace("resource", make_ref(attr.resource));
+    attrs.emplace("about", make_ref(attr.about));
+    attrs.emplace("property", make_ref(attr.property));
 }
 
 struct core_t
@@ -359,6 +512,38 @@ struct core_t
     boost::optional<space_t> space;
 };
 
+std::ostream& operator<<(std::ostream& os, core_t::space_t e)
+{
+    switch(e)
+    {
+        case core_t::space_t::_default:
+            os << "default";
+            break;
+        case core_t::space_t::preserve:
+            os << "preserve";
+            break;
+    }
+    return os;
+}
+std::istream& operator>>(std::istream& is, core_t::space_t& e)
+{
+    std::string tok;
+    is >> tok;
+    if(tok == "default")
+        e = core_t::space_t::_default;
+    else if(tok == "preserve")
+        e = core_t::space_t::preserve;
+    else
+        throw std::invalid_argument("unrecognised value for space: " + tok);
+    return is;
+}
+
+void map_attributes(core_t& attr, attribute_map_t& attrs)
+{
+    map_attributes(attr.common, attrs);
+    attrs.emplace("space", make_ref(attr.space));
+}
+
 struct conditional_t
 {
     boost::optional<std::vector<network::uri>> requiredFeatures;
@@ -367,6 +552,15 @@ struct conditional_t
     boost::optional<std::vector<std::string>> requiredFonts;
     boost::optional<std::vector<std::string>> systemLanguage;
 };
+
+void map_attributes(conditional_t& attr, attribute_map_t& attrs)
+{
+//    attrs.emplace("requiredFeatures", make_ref(attr.requiredFeatures));
+//    attrs.emplace("requiredExtensions", make_ref(attr.requiredExtensions));
+//    attrs.emplace("requiredFormats", make_ref(attr.requiredFormats));
+//    attrs.emplace("requiredFonts", make_ref(attr.requiredFonts));
+//    attrs.emplace("systemLanguage", make_ref(attr.systemLanguage));
+}
 
 struct media_t
 {
@@ -477,6 +671,112 @@ struct media_t
     boost::optional<viewport_fill_opacity_t> viewport_fill_opacity;
 };
 
+std::ostream& operator<<(std::ostream& os, media_t::display_t e)
+{
+    switch(e)
+    {
+        case media_t::display_t::_inline:
+            os << "inline";
+            break;
+        case media_t::display_t::block:
+            os << "block";
+            break;
+        case media_t::display_t::list_item:
+            os << "list-item";
+            break;
+        case media_t::display_t::run_in:
+            os << "run-in";
+            break;
+        case media_t::display_t::compact:
+            os << "compact";
+            break;
+        case media_t::display_t::marker:
+            os << "marker";
+            break;
+        case media_t::display_t::table:
+            os << "table";
+            break;
+        case media_t::display_t::inline_table:
+            os << "inline-table";
+            break;
+        case media_t::display_t::table_row_group:
+            os << "table-row-group";
+            break;
+        case media_t::display_t::table_header_group:
+            os << "table-header-group";
+            break;
+        case media_t::display_t::table_footer_group:
+            os << "table-footer-group";
+            break;
+        case media_t::display_t::table_row:
+            os << "table-row";
+            break;
+        case media_t::display_t::table_column_group:
+            os << "table-column-group";
+            break;
+        case media_t::display_t::table_column:
+            os << "table-column";
+            break;
+        case media_t::display_t::table_cell:
+            os << "table-cell";
+            break;
+        case media_t::display_t::table_caption:
+            os << "table-caption";
+            break;
+        case media_t::display_t::none:
+            os << "none";
+            break;
+        case media_t::display_t::inherit:
+            os << "inherit";
+            break;
+    }
+    return os;
+}
+std::istream& operator>>(std::istream& is, media_t::display_t& e)
+{
+    std::string tok;
+    is >> tok;
+    if(tok == "inline")
+        e = media_t::display_t::_inline;
+    else if(tok == "block")
+        e = media_t::display_t::block;
+    else if(tok == "list-item")
+        e = media_t::display_t::list_item;
+    else if(tok == "run-in")
+        e = media_t::display_t::run_in;
+    else if(tok == "compact")
+        e = media_t::display_t::compact;
+    else if(tok == "marker")
+        e = media_t::display_t::marker;
+    else if(tok == "table")
+        e = media_t::display_t::table;
+    else if(tok == "inline-table")
+        e = media_t::display_t::inline_table;
+    else if(tok == "table-row-group")
+        e = media_t::display_t::table_row_group;
+    else if(tok == "table-header-group")
+        e = media_t::display_t::table_header_group;
+    else if(tok == "table-footer-group")
+        e = media_t::display_t::table_footer_group;
+    else if(tok == "table-row")
+        e = media_t::display_t::table_row;
+    else if(tok == "table-column-group")
+        e = media_t::display_t::table_column_group;
+    else if(tok == "table-column")
+        e = media_t::display_t::table_column;
+    else if(tok == "table-cell")
+        e = media_t::display_t::table_cell;
+    else if(tok == "table-caption")
+        e = media_t::display_t::table_caption;
+    else if(tok == "none")
+        e = media_t::display_t::none;
+    else if(tok == "inherit")
+        e = media_t::display_t::inherit;
+    else
+        throw std::invalid_argument("unrecognised value for display: " + tok);
+    return is;
+}
+
 }
 
 dom::qualified_name SVG = {"svg", "http://www.w3.org/2000/svg"};
@@ -582,6 +882,7 @@ struct desc_element_t : dom::element_t
         /* need a good way to map variable attributes to access by name.
          * something that associates the (potential) value with a name
          * so it can be get and set. */
+        return {};
     }
     virtual void set_attribute(const dom::qualified_name& name, const boost::optional<std::string>& value) override
     {

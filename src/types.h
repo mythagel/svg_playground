@@ -26,6 +26,7 @@
 #define TYPES_H_
 #include <string>
 #include <vector>
+#include <iosfwd>
 
 namespace svg
 {
@@ -34,8 +35,25 @@ namespace types
 
 struct length
 {
+    float value;
+    enum class unit_t
+    {
+        ucs,
+        cm,
+        mm,
+        pt,
+        pc,
+        px,
+        pct
+    } unit;
 
+    length();
+    explicit length(float value);
+    explicit length(float value, unit_t unit);
 };
+
+std::ostream& operator<<(std::ostream& os, const length& l);
+std::istream& operator>>(std::istream& is, length& l);
 
 bool parse_bool(const std::string& str);
 
