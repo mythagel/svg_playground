@@ -16,40 +16,35 @@
  */
 
 /*
- * transformparser.h
+ * basic.h
  *
- *  Created on: 2013-12-09
+ *  Created on: 2013-12-05
  *      Author: nicholas
  */
 
-#ifndef TRANSFORMPARSER_H_
-#define TRANSFORMPARSER_H_
-#include <array>
-#include <stdexcept>
+#ifndef PARSERS_BASIC_H_
+#define PARSERS_BASIC_H_
+#include <string>
 
 namespace svg
 {
-namespace transform
+namespace types
+{
+namespace parsers
 {
 
-struct parse_error : std::runtime_error
-{
-    parse_error(const std::string& what);
-    virtual ~parse_error() noexcept;
-};
+bool ws_p(const char c);
+bool parse_whitespace(const char*& c, const char* const end);
 
-/*
-Parser that reduces all transformation lists down to a matrix
+bool number_p(const char c);
+bool parse_number(const char*& c, const char* const end, float& x);
 
-[a b c d e f] ->
+bool parse_comma_wsp(const char*& c, const char* const end);
 
-[a c e]
-[b d f]
-[0 0 1]
-*/
-std::array<float, 6> parse_transforms(const char* c, const char* const end);
+bool parse_bool(const std::string& str);
 
 }
 }
+}
 
-#endif /* TRANSFORMPARSER_H_ */
+#endif /* PARSERS_BASIC_H_ */

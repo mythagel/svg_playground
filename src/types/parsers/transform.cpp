@@ -16,14 +16,14 @@
  */
 
 /*
- * transformparser.cpp
+ * transform.cpp
  *
  *  Created on: 2013-12-09
  *      Author: nicholas
  */
 
-#include "transformparser.h"
-#include "parsers.h"
+#include "transform.h"
+#include "basic.h"
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/storage.hpp>
 #include <algorithm>
@@ -31,12 +31,15 @@
 
 namespace svg
 {
+namespace types
+{
+namespace parsers
+{
 namespace transform
 {
 
 static const auto DEG_TO_RAD = 0.0174532925;
 
-using namespace svg::parser;
 namespace ublas = boost::numeric::ublas;
 
 typedef ublas::matrix<float, ublas::row_major, ublas::bounded_array<float, 9>> matrix;
@@ -342,4 +345,5 @@ std::array<float, 6> parse_transforms(const char* c, const char* const end)
 
 }
 }
-
+}
+}

@@ -16,20 +16,22 @@
  */
 
 /*
- * parsers.cpp
+ * basic.cpp
  *
  *  Created on: 2013-12-05
  *      Author: nicholas
  */
 
-#include "parsers.h"
+#include "basic.h"
 #include <cctype>
 #include <stdexcept>
 #include <cstdlib>
 
 namespace svg
 {
-namespace parser
+namespace types
+{
+namespace parsers
 {
 
 namespace
@@ -107,6 +109,16 @@ bool parse_comma_wsp(const char*& c, const char* const end)
     return true;
 }
 
+bool parse_bool(const std::string& str)
+{
+    if(str == "true")
+        return true;
+    else if(str == "false")
+        return false;
+    throw std::invalid_argument("invalid value for bool: " + str);
+}
+
+}
 }
 }
 

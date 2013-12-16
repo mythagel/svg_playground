@@ -16,37 +16,33 @@
  */
 
 /*
- * colour.h
+ * stringlist.cpp
  *
- *  Created on: 2013-12-03
+ *  Created on: 2013-12-17
  *      Author: nicholas
  */
 
-#ifndef COLOUR_H_
-#define COLOUR_H_
-#include <string>
-#include <cstdint>
-#include <iosfwd>
+#include "stringlist.h"
+#include <ostream>
+#include <istream>
+#include <iterator>
+#include <algorithm>
 
 namespace svg
 {
 namespace types
 {
 
-struct colour
+std::ostream& operator<<(std::ostream& os, const stringlist_t& list)
 {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-    
-    colour();
-    colour(uint8_t r, uint8_t g, uint8_t b);
-    colour(const std::string& str);
-};
-
-std::ostream& operator<<(std::ostream& os, const colour& c);
+    std::copy(begin(list.data), end(list.data), std::ostream_iterator<std::string>(os, " "));
+    return os;
+}
+std::istream& operator>>(std::istream& is, stringlist_t& list)
+{
+    list.data = std::vector<std::string>(std::istream_iterator<std::string>{is}, std::istream_iterator<std::string>{});
+    return is;
+}
 
 }
 }
-
-#endif /* COLOUR_H_ */

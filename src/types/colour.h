@@ -16,27 +16,36 @@
  */
 
 /*
- * types.h
+ * colour.h
  *
- *  Created on: 2013-12-05
+ *  Created on: 2013-12-03
  *      Author: nicholas
  */
 
-#ifndef TYPES_H_
-#define TYPES_H_
-#include <string>
-#include <vector>
+#ifndef COLOUR_H_
+#define COLOUR_H_
+#include <cstdint>
+#include <iosfwd>
 
 namespace svg
 {
 namespace types
 {
 
-bool parse_bool(const std::string& str);
+struct colour
+{
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+    
+    colour();
+    colour(uint8_t r, uint8_t g, uint8_t b);
+};
 
-// std::vector<std::string> parse_string_list(const std::string& str);
+std::ostream& operator<<(std::ostream& os, const colour& c);
+std::istream& operator>>(std::istream& is, colour& c);
 
 }
 }
 
-#endif /* TYPES_H_ */
+#endif /* COLOUR_H_ */

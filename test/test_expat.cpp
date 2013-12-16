@@ -15,14 +15,18 @@
 #include <utility>
 #include <stdexcept>
 #include <sstream>
-#include "colour.h"
 #include "make_unique.h"
+
+#include "types/colour.h"
+#include "types/stringlist.h"
 
 #include "dom/qualified_name.h"
 #include "dom/node.h"
 #include "dom/element.h"
 #include "dom/character.h"
 #include "dom/basic_element.h"
+
+#include "attr.h"
 
 namespace network
 {
@@ -45,107 +49,6 @@ namespace svg
 {
 namespace attr
 {
-
-/* Generic string access to typed (member variable)
- * attributes */
-struct typed_attribute
-{
-    virtual boost::optional<std::string> get() const = 0;
-    virtual void set(const boost::optional<std::string>& value) =0;
-    virtual ~typed_attribute()
-    {
-    }
-};
-
-/* Typed attribute whose storage is a reference to an
- * optional attribute elsewhere. */
-template <typename T>
-struct optional_typed_attribute_ref : typed_attribute
-{
-    std::reference_wrapper<boost::optional<T>> value;
-
-    optional_typed_attribute_ref(boost::optional<T>& value)
-     : value(std::ref(value))
-    {
-    }
-
-    virtual boost::optional<std::string> get() const override
-    {
-        auto& v = value.get();
-        if(!v)
-            return boost::none;
-        std::ostringstream s;
-        s << *v;
-        return { s.str() };
-    }
-    virtual void set(const boost::optional<std::string>& new_value) override
-    {
-        auto& v = value.get();
-        if(new_value)
-        {
-            std::istringstream s(*new_value);
-            if(!v)
-                v = boost::make_optional(T());
-            s >> *v;
-        }
-        else
-        {
-            v = boost::none;
-        }
-    }
-
-    virtual ~optional_typed_attribute_ref()
-    {
-    }
-};
-
-template <>
-struct optional_typed_attribute_ref<std::string> : typed_attribute
-{
-    std::reference_wrapper<boost::optional<std::string>> value;
-
-    optional_typed_attribute_ref(boost::optional<std::string>& value)
-     : value(std::ref(value))
-    {
-    }
-
-    virtual boost::optional<std::string> get() const override
-    {
-        return value;
-    }
-    virtual void set(const boost::optional<std::string>& new_value) override
-    {
-        value.get() = new_value;
-    }
-
-    virtual ~optional_typed_attribute_ref()
-    {
-    }
-};
-
-template<typename T>
-auto make_ref(boost::optional<T>& value) -> std::unique_ptr<optional_typed_attribute_ref<T>>
-{
-    return make_unique<optional_typed_attribute_ref<T>>(value);
-}
-
-using attribute_map_t = std::map<std::string, std::unique_ptr<typed_attribute>>;
-
-struct stringlist_t
-{
-    std::vector<std::string> data;
-};
-
-std::ostream& operator<<(std::ostream& os, const stringlist_t& list)
-{
-    std::copy(begin(list.data), end(list.data), std::ostream_iterator<std::string>(os, " "));
-    return os;
-}
-std::istream& operator>>(std::istream& is, stringlist_t& list)
-{
-    list.data = std::vector<std::string>(std::istream_iterator<std::string>{is}, std::istream_iterator<std::string>{});
-    return is;
-}
 
 struct bidi_t
 {
@@ -281,32 +184,32 @@ struct core_common_t
     boost::optional<network::uri> base;
     boost::optional<std::string> lang;
     boost::optional<std::string> _class;
-    boost::optional<stringlist_t> role;
-    boost::optional<stringlist_t> rel;
-    boost::optional<stringlist_t> rev;
-    boost::optional<stringlist_t> _typeof;
+    boost::optional<types::stringlist_t> role;
+    boost::optional<types::stringlist_t> rel;
+    boost::optional<types::stringlist_t> rev;
+    boost::optional<types::stringlist_t> _typeof;
     boost::optional<std::string> content;
     boost::optional<std::string> datatype;
     boost::optional<std::string> resource;
-    boost::optional<stringlist_t> about;
-    boost::optional<stringlist_t> property;
+    boost::optional<types::stringlist_t> about;
+    boost::optional<types::stringlist_t> property;
 };
 
 void map_attributes(core_common_t& attr, attribute_map_t& attrs)
 {
-    attrs.emplace("id", make_ref(attr.id));
-    attrs.emplace("base", make_ref(attr.base));
-    attrs.emplace("lang", make_ref(attr.lang));
-    attrs.emplace("class", make_ref(attr._class));
-    attrs.emplace("role", make_ref(attr.role));
-    attrs.emplace("rel", make_ref(attr.rel));
-    attrs.emplace("rev", make_ref(attr.rev));
-    attrs.emplace("typeof", make_ref(attr._typeof));
-    attrs.emplace("content", make_ref(attr.content));
-    attrs.emplace("datatype", make_ref(attr.datatype));
-    attrs.emplace("resource", make_ref(attr.resource));
-    attrs.emplace("about", make_ref(attr.about));
-    attrs.emplace("property", make_ref(attr.property));
+    attrs.emplace("id", make_attr(attr.id));
+    attrs.emplace("base", make_attr(attr.base));
+    attrs.emplace("lang", make_attr(attr.lang));
+    attrs.emplace("class", make_attr(attr._class));
+    attrs.emplace("role", make_attr(attr.role));
+    attrs.emplace("rel", make_attr(attr.rel));
+    attrs.emplace("rev", make_attr(attr.rev));
+    attrs.emplace("typeof", make_attr(attr._typeof));
+    attrs.emplace("content", make_attr(attr.content));
+    attrs.emplace("datatype", make_attr(attr.datatype));
+    attrs.emplace("resource", make_attr(attr.resource));
+    attrs.emplace("about", make_attr(attr.about));
+    attrs.emplace("property", make_attr(attr.property));
 }
 
 struct core_t
@@ -351,7 +254,7 @@ std::istream& operator>>(std::istream& is, core_t::space_t& e)
 void map_attributes(core_t& attr, attribute_map_t& attrs)
 {
     map_attributes(attr.common, attrs);
-    attrs.emplace("space", make_ref(attr.space));
+    attrs.emplace("space", make_attr(attr.space));
 }
 
 struct conditional_t
@@ -365,11 +268,11 @@ struct conditional_t
 
 void map_attributes(conditional_t& attr, attribute_map_t& attrs)
 {
-//    attrs.emplace("requiredFeatures", make_ref(attr.requiredFeatures));
-//    attrs.emplace("requiredExtensions", make_ref(attr.requiredExtensions));
-//    attrs.emplace("requiredFormats", make_ref(attr.requiredFormats));
-//    attrs.emplace("requiredFonts", make_ref(attr.requiredFonts));
-//    attrs.emplace("systemLanguage", make_ref(attr.systemLanguage));
+//    attrs.emplace("requiredFeatures", make_attr(attr.requiredFeatures));
+//    attrs.emplace("requiredExtensions", make_attr(attr.requiredExtensions));
+//    attrs.emplace("requiredFormats", make_attr(attr.requiredFormats));
+//    attrs.emplace("requiredFonts", make_attr(attr.requiredFonts));
+//    attrs.emplace("systemLanguage", make_attr(attr.systemLanguage));
 }
 
 struct media_t

@@ -16,29 +16,22 @@
  */
 
 /*
- * parsers.h
+ * attr.cpp
  *
- *  Created on: 2013-12-05
+ *  Created on: 2013-12-17
  *      Author: nicholas
  */
 
-#ifndef PARSERS_H_
-#define PARSERS_H_
+#include "attr.h"
 
 namespace svg
 {
-namespace parser
+namespace attr
 {
 
-bool ws_p(const char c);
-bool parse_whitespace(const char*& c, const char* const end);
-
-bool number_p(const char c);
-bool parse_number(const char*& c, const char* const end, float& x);
-
-bool parse_comma_wsp(const char*& c, const char* const end);
+typed_attribute::~typed_attribute()
+{
+}
 
 }
 }
-
-#endif /* PARSERS_H_ */

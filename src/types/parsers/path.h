@@ -16,17 +16,21 @@
  */
 
 /*
- * pathparser.h
+ * path.h
  *
  *  Created on: 2013-12-04
  *      Author: nicholas
  */
 
-#ifndef PATHPARSER_H_
-#define PATHPARSER_H_
+#ifndef PARSERS_PATH_H_
+#define PARSERS_PATH_H_
 #include <stdexcept>
 
 namespace svg
+{
+namespace types
+{
+namespace parsers
 {
 namespace path
 {
@@ -74,5 +78,7 @@ public:
 
 }
 }
+}
+}
 
-#endif /* PATHPARSER_H_ */
+#endif /* PARSERS_PATH_H_ */

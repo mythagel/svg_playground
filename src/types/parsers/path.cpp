@@ -16,24 +16,26 @@
  */
 
 /*
- * pathparser.cpp
+ * path.cpp
  *
  *  Created on: 2013-12-04
  *      Author: nicholas
  */
 
-#include "pathparser.h"
-#include "parsers.h"
+#include "path.h"
+#include "basic.h"
 #include <cctype>
 #include <cerrno>
 #include <sstream>
 
 namespace svg
 {
+namespace types
+{
+namespace parsers
+{
 namespace path
 {
-
-using namespace svg::parser;
 
 namespace
 {
@@ -351,4 +353,5 @@ parser::~parser()
 
 }
 }
-
+}
+}

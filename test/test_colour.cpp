@@ -1,4 +1,4 @@
-#include "colour.h"
+#include "types/colour.h"
 #include <iostream>
 
 using namespace svg::types;

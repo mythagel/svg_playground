@@ -16,29 +16,32 @@
  */
 
 /*
- * types.cpp
+ * stringlist.h
  *
- *  Created on: 2013-12-05
+ *  Created on: 2013-12-17
  *      Author: nicholas
  */
 
-#include "types.h"
-#include <stdexcept>
+#ifndef STRINGLIST_H_
+#define STRINGLIST_H_
+#include <vector>
+#include <string>
+#include <iosfwd>
 
 namespace svg
 {
 namespace types
 {
 
-bool parse_bool(const std::string& str)
+struct stringlist_t
 {
-    if(str == "true")
-        return true;
-    else if(str == "false")
-        return false;
-    throw std::invalid_argument("invalid value for bool: " + str);
-}
+    std::vector<std::string> data;
+};
+
+std::ostream& operator<<(std::ostream& os, const stringlist_t& list);
+std::istream& operator>>(std::istream& is, stringlist_t& list);
 
 }
 }
 
+#endif /* STRINGLIST_H_ */

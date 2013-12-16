@@ -24,8 +24,7 @@
 
 #ifndef DOCUMENT_H_
 #define DOCUMENT_H_
-#include "colour.h"
-#include "types.h"
+#include "types/colour.h"
 #include "types/length.h"
 #include <boost/variant.hpp>
 #include <boost/optional.hpp>

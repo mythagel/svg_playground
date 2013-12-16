@@ -23,10 +23,12 @@
  */
 
 #include "colour.h"
+#include <string>
 #include <stdexcept>
 #include <cstdio>
 #include <iostream>
 #include <iomanip>
+#include <iterator>
 
 namespace svg
 {
@@ -35,8 +37,7 @@ namespace types
 
 namespace
 {
-
-struct
+const struct
 {
     const char* name;
     const char* value;
@@ -59,7 +60,6 @@ struct
     {"fuchsia", "rgb(255, 0, 255)"},
     {"aqua", "rgb(0, 255, 255)"}
 };
-
 }
 
 colour::colour()
@@ -72,49 +72,6 @@ colour::colour(uint8_t r, uint8_t g, uint8_t b)
 {
 }
 
-colour::colour(const std::string& str)
- : r(), g(), b()
-{
-    if(str.empty()) throw std::invalid_argument("empty colour specification");
-    auto clr = str;
-    
-    // normalise #rgb to #rrggbb
-    if(clr.size() == 4 && clr[0] == '#')
-        clr = std::string("#") + clr[1]+clr[1] + clr[2]+clr[2] + clr[3]+clr[3];
-    
-    // normalise names to values
-    for(auto& colour : colour_map)
-    {
-        if(clr == colour.name)
-        {
-            clr = colour.value;
-            break;
-        }
-    }
-    
-    if(clr.size() == 7 && clr[0] == '#')
-    {
-        if (std::sscanf(clr.c_str() + 1, "%2hhx%2hhx%2hhx", &r, &g, &b) != 3)
-            throw std::invalid_argument("Invalid colour " + str);
-    }
-    else if(clr.find("rgb(") == 0 && clr.back() == ')')
-    {
-        if (sscanf(clr.c_str() + 4, "%hhu , %hhu , %hhu", &r, &g, &b) != 3)
-        {
-            float rf, gf, bf;
-            if (sscanf(clr.c_str() + 4, "%f%% , %f%% , %f%%", &rf, &gf, &bf) != 3)
-                throw std::invalid_argument("Invalid colour " + str);
-            r = (rf / 100.0) * 255;
-            g = (gf / 100.0) * 255;
-            b = (bf / 100.0) * 255;
-        }
-    }
-    else
-    {
-        throw std::invalid_argument("Invalid colour " + str);
-    }
-}
-
 std::ostream& operator<<(std::ostream& os, const colour& c)
 {
     os << "rgb(" << static_cast<int>(c.r) << ", " << static_cast<int>(c.g) << ", " << static_cast<int>(c.b) << ")";
@@ -122,6 +79,52 @@ std::ostream& operator<<(std::ostream& os, const colour& c)
 //       << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(c.g) 
 //       << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(c.b);
     return os;
+}
+std::istream& operator>>(std::istream& is, colour& c)
+{
+    is >> std::noskipws;
+    std::string str(std::istream_iterator<char>{is}, std::istream_iterator<char>{});
+
+    if(str.empty()) throw std::invalid_argument("empty colour specification");
+    auto clr = str;
+
+    // normalise #rgb to #rrggbb
+    if(clr.size() == 4 && clr[0] == '#')
+        clr = std::string("#") + clr[1]+clr[1] + clr[2]+clr[2] + clr[3]+clr[3];
+
+    // normalise names to values
+    for(const auto& colour : colour_map)
+    {
+        if(clr == colour.name)
+        {
+            clr = colour.value;
+            break;
+        }
+    }
+
+    if(clr.size() == 7 && clr[0] == '#')
+    {
+        if (std::sscanf(clr.c_str() + 1, "%2hhx%2hhx%2hhx", &c.r, &c.g, &c.b) != 3)
+            throw std::invalid_argument("Invalid colour " + str);
+    }
+    else if(clr.find("rgb(") == 0 && clr.back() == ')')
+    {
+        if (sscanf(clr.c_str() + 4, "%hhu , %hhu , %hhu", &c.r, &c.g, &c.b) != 3)
+        {
+            float rf, gf, bf;
+            if (sscanf(clr.c_str() + 4, "%f%% , %f%% , %f%%", &rf, &gf, &bf) != 3)
+                throw std::invalid_argument("Invalid colour " + str);
+            c.r = (rf / 100.0) * 255;
+            c.g = (gf / 100.0) * 255;
+            c.b = (bf / 100.0) * 255;
+        }
+    }
+    else
+    {
+        throw std::invalid_argument("Invalid colour " + str);
+    }
+
+    return is;
 }
 
 }
