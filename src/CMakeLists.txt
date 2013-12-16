@@ -4,6 +4,9 @@ add_library(svg STATIC document.cpp svg.cpp attr.cpp
 types/length.cpp
 types/colour.cpp
 types/stringlist.cpp
+types/core.cpp
+types/media.cpp
+types/bidi.cpp
 
 types/parsers/basic.cpp
 types/parsers/path.cpp

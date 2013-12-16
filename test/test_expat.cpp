@@ -19,6 +19,9 @@
 
 #include "types/colour.h"
 #include "types/stringlist.h"
+#include "types/core.h"
+#include "types/media.h"
+#include "types/bidi.h"
 
 #include "dom/qualified_name.h"
 #include "dom/node.h"
@@ -52,22 +55,8 @@ namespace attr
 
 struct bidi_t
 {
-    enum class direction_t
-    {
-        ltr,
-        rtl,
-        inherit
-    };
-    boost::optional<direction_t> direction;
-
-    enum class unicode_bidi_t
-    {
-        normal,
-        embed,
-        bidi_override,
-        inherit
-    };
-    boost::optional<unicode_bidi_t> unicode_bidi;
+    boost::optional<types::bidi::direction> direction;
+    boost::optional<types::bidi::unicode_bidi> unicode_bidi;
 };
 
 struct media_t;
@@ -216,40 +205,8 @@ struct core_t
 {
     core_common_t common;
 
-    enum class space_t
-    {
-        _default,
-        preserve
-    };
-
-    boost::optional<space_t> space;
+    boost::optional<types::core::space> space;
 };
-
-std::ostream& operator<<(std::ostream& os, core_t::space_t e)
-{
-    switch(e)
-    {
-        case core_t::space_t::_default:
-            os << "default";
-            break;
-        case core_t::space_t::preserve:
-            os << "preserve";
-            break;
-    }
-    return os;
-}
-std::istream& operator>>(std::istream& is, core_t::space_t& e)
-{
-    std::string tok;
-    is >> tok;
-    if(tok == "default")
-        e = core_t::space_t::_default;
-    else if(tok == "preserve")
-        e = core_t::space_t::preserve;
-    else
-        throw std::invalid_argument("unrecognised value for space: " + tok);
-    return is;
-}
 
 void map_attributes(core_t& attr, attribute_map_t& attrs)
 {
@@ -277,218 +234,17 @@ void map_attributes(conditional_t& attr, attribute_map_t& attrs)
 
 struct media_t
 {
-    enum class display_t
-    {
-        _inline,
-        block,
-        list_item,
-        run_in,
-        compact,
-        marker,
-        table,
-        inline_table,
-        table_row_group,
-        table_header_group,
-        table_footer_group,
-        table_row,
-        table_column_group,
-        table_column,
-        table_cell,
-        table_caption,
-        none,
-        inherit
-    };
-    boost::optional<display_t> display;
-
-    enum class visibility_t
-    {
-        visible,
-        hidden,
-        inherit
-    };
-    boost::optional<visibility_t> visibility;
-
-    enum class image_rendering_t
-    {
-        _auto,
-        optimizeSpeed,
-        optimizeQuality,
-        inherit
-    };
-    boost::optional<image_rendering_t> image_rendering;
-
-    enum class pointer_events_t
-    {
-        visiblePainted,
-        visibleFill,
-        visibleStroke,
-        visible,
-        painted,
-        fill,
-        stroke,
-        all,
-        none,
-        inherit
-    };
-    boost::optional<pointer_events_t> pointer_events;
-
-    enum class shape_rendering_t
-    {
-        _auto,
-        optimizeSpeed,
-        crispEdges,
-        geometricPrecision,
-        inherit
-    };
-    boost::optional<shape_rendering_t> shape_rendering;
-
-    enum class text_rendering_t
-    {
-        _auto,
-        optimizeSpeed,
-        optimizeLegibility,
-        geometricPrecision,
-        inherit
-    };
-    boost::optional<text_rendering_t> text_rendering;
-
-    enum class buffered_rendering_t
-    {
-        _auto,
-        dynamic,
-        _static,
-        inherit
-    };
-    boost::optional<buffered_rendering_t> buffered_rendering;
-
-    enum class audio_level_enum_t
-    {
-        inherit
-    };
-    using audio_level_t = boost::variant<audio_level_enum_t, float>;
-    boost::optional<audio_level_t> audio_level;
-
-    enum class viewport_fill_enum_t
-    {
-        inherit,
-        none
-    };
-    using viewport_fill_t = boost::variant<viewport_fill_enum_t, svg::types::colour>;
-    boost::optional<viewport_fill_t> viewport_fill;
-
-    enum class viewport_fill_opacity_enum_t
-    {
-        inherit
-    };
-    using viewport_fill_opacity_t = boost::variant<viewport_fill_opacity_enum_t, float>;
-    boost::optional<viewport_fill_opacity_t> viewport_fill_opacity;
+    boost::optional<types::media::display> display;
+    boost::optional<types::media::visibility> visibility;
+    boost::optional<types::media::image_rendering> image_rendering;
+    boost::optional<types::media::pointer_events> pointer_events;
+    boost::optional<types::media::shape_rendering> shape_rendering;
+    boost::optional<types::media::text_rendering> text_rendering;
+    boost::optional<types::media::buffered_rendering> buffered_rendering;
+    boost::optional<types::media::audio_level> audio_level;
+    boost::optional<types::media::viewport_fill> viewport_fill;
+    boost::optional<types::media::viewport_fill_opacity> viewport_fill_opacity;
 };
-
-std::ostream& operator<<(std::ostream& os, media_t::display_t e)
-{
-    switch(e)
-    {
-        case media_t::display_t::_inline:
-            os << "inline";
-            break;
-        case media_t::display_t::block:
-            os << "block";
-            break;
-        case media_t::display_t::list_item:
-            os << "list-item";
-            break;
-        case media_t::display_t::run_in:
-            os << "run-in";
-            break;
-        case media_t::display_t::compact:
-            os << "compact";
-            break;
-        case media_t::display_t::marker:
-            os << "marker";
-            break;
-        case media_t::display_t::table:
-            os << "table";
-            break;
-        case media_t::display_t::inline_table:
-            os << "inline-table";
-            break;
-        case media_t::display_t::table_row_group:
-            os << "table-row-group";
-            break;
-        case media_t::display_t::table_header_group:
-            os << "table-header-group";
-            break;
-        case media_t::display_t::table_footer_group:
-            os << "table-footer-group";
-            break;
-        case media_t::display_t::table_row:
-            os << "table-row";
-            break;
-        case media_t::display_t::table_column_group:
-            os << "table-column-group";
-            break;
-        case media_t::display_t::table_column:
-            os << "table-column";
-            break;
-        case media_t::display_t::table_cell:
-            os << "table-cell";
-            break;
-        case media_t::display_t::table_caption:
-            os << "table-caption";
-            break;
-        case media_t::display_t::none:
-            os << "none";
-            break;
-        case media_t::display_t::inherit:
-            os << "inherit";
-            break;
-    }
-    return os;
-}
-std::istream& operator>>(std::istream& is, media_t::display_t& e)
-{
-    std::string tok;
-    is >> tok;
-    if(tok == "inline")
-        e = media_t::display_t::_inline;
-    else if(tok == "block")
-        e = media_t::display_t::block;
-    else if(tok == "list-item")
-        e = media_t::display_t::list_item;
-    else if(tok == "run-in")
-        e = media_t::display_t::run_in;
-    else if(tok == "compact")
-        e = media_t::display_t::compact;
-    else if(tok == "marker")
-        e = media_t::display_t::marker;
-    else if(tok == "table")
-        e = media_t::display_t::table;
-    else if(tok == "inline-table")
-        e = media_t::display_t::inline_table;
-    else if(tok == "table-row-group")
-        e = media_t::display_t::table_row_group;
-    else if(tok == "table-header-group")
-        e = media_t::display_t::table_header_group;
-    else if(tok == "table-footer-group")
-        e = media_t::display_t::table_footer_group;
-    else if(tok == "table-row")
-        e = media_t::display_t::table_row;
-    else if(tok == "table-column-group")
-        e = media_t::display_t::table_column_group;
-    else if(tok == "table-column")
-        e = media_t::display_t::table_column;
-    else if(tok == "table-cell")
-        e = media_t::display_t::table_cell;
-    else if(tok == "table-caption")
-        e = media_t::display_t::table_caption;
-    else if(tok == "none")
-        e = media_t::display_t::none;
-    else if(tok == "inherit")
-        e = media_t::display_t::inherit;
-    else
-        throw std::invalid_argument("unrecognised value for display: " + tok);
-    return is;
-}
 
 }
 
