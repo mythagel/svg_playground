@@ -16,29 +16,19 @@
  */
 
 /*
- * types.cpp
+ * element.cpp
  *
- *  Created on: 2013-12-05
+ *  Created on: 2013-12-16
  *      Author: nicholas
  */
 
-#include "types.h"
-#include <stdexcept>
+#include "element.h"
 
-namespace svg
-{
-namespace types
+namespace dom
 {
 
-bool parse_bool(const std::string& str)
+element_t::~element_t()
 {
-    if(str == "true")
-        return true;
-    else if(str == "false")
-        return false;
-    throw std::invalid_argument("invalid value for bool: " + str);
 }
 
 }
-}
-

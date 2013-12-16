@@ -16,29 +16,35 @@
  */
 
 /*
- * types.cpp
+ * element.h
  *
- *  Created on: 2013-12-05
+ *  Created on: 2013-12-16
  *      Author: nicholas
  */
 
-#include "types.h"
-#include <stdexcept>
+#ifndef ELEMENT_H_
+#define ELEMENT_H_
+#include <memory>
+#include <string>
+#include "node.h"
+#include "qualified_name.h"
+#include <boost/optional.hpp>
 
-namespace svg
-{
-namespace types
+namespace dom
 {
 
-bool parse_bool(const std::string& str)
+struct element_t;
+using element = std::shared_ptr<element_t>;
+
+struct element_t : node_t
 {
-    if(str == "true")
-        return true;
-    else if(str == "false")
-        return false;
-    throw std::invalid_argument("invalid value for bool: " + str);
+    virtual qualified_name name() const =0;
+    virtual boost::optional<std::string> get_attribute(const qualified_name& name) const =0;
+    virtual void set_attribute(const qualified_name& name, const boost::optional<std::string>& value) =0;
+
+    virtual ~element_t();
+};
+
 }
 
-}
-}
-
+#endif /* ELEMENT_H_ */

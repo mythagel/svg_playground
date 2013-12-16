@@ -16,29 +16,47 @@
  */
 
 /*
- * types.cpp
+ * character.cpp
  *
- *  Created on: 2013-12-05
+ *  Created on: 2013-12-16
  *      Author: nicholas
  */
 
-#include "types.h"
+#include "character.h"
 #include <stdexcept>
 
-namespace svg
-{
-namespace types
+namespace dom
 {
 
-bool parse_bool(const std::string& str)
+character_t::character_t(const std::string& data)
+ : data(data)
 {
-    if(str == "true")
-        return true;
-    else if(str == "false")
-        return false;
-    throw std::invalid_argument("invalid value for bool: " + str);
+}
+
+node character_t::append(const node&)
+{
+    throw std::runtime_error("character node cannot have children.");
+}
+
+node character_t::insert(const node&, const node&)
+{
+    throw std::runtime_error("character node cannot have children.");
+}
+
+node character_t::erase(const node&)
+{
+    throw std::runtime_error("character node cannot have children.");
+}
+
+node character_t::clone(bool)
+{
+    auto dup = std::make_shared<character_t>(*this);
+    dup->parent.reset();
+    return dup;
+}
+
+character_t::~character_t()
+{
 }
 
 }
-}
-

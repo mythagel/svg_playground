@@ -16,29 +16,36 @@
  */
 
 /*
- * types.cpp
+ * node.h
  *
- *  Created on: 2013-12-05
+ *  Created on: 2013-12-16
  *      Author: nicholas
  */
 
-#include "types.h"
-#include <stdexcept>
+#ifndef NODE_H_
+#define NODE_H_
+#include <memory>
+#include <vector>
 
-namespace svg
-{
-namespace types
+namespace dom
 {
 
-bool parse_bool(const std::string& str)
+struct node_t;
+using node = std::shared_ptr<node_t>;
+
+struct node_t : std::enable_shared_from_this<node_t>
 {
-    if(str == "true")
-        return true;
-    else if(str == "false")
-        return false;
-    throw std::invalid_argument("invalid value for bool: " + str);
+    node parent;
+    std::vector<node> children;
+
+    virtual node append(const node& child);
+    virtual node insert(const node& child, const node& ref);
+    virtual node erase(const node& child);
+    virtual node clone(bool deep) =0;
+
+    virtual ~node_t();
+};
+
 }
 
-}
-}
-
+#endif /* NODE_H_ */

@@ -16,29 +16,44 @@
  */
 
 /*
- * types.cpp
+ * length.h
  *
- *  Created on: 2013-12-05
+ *  Created on: 2013-12-16
  *      Author: nicholas
  */
 
-#include "types.h"
-#include <stdexcept>
+#ifndef LENGTH_H_
+#define LENGTH_H_
+#include <iosfwd>
 
 namespace svg
 {
 namespace types
 {
 
-bool parse_bool(const std::string& str)
+struct length
 {
-    if(str == "true")
-        return true;
-    else if(str == "false")
-        return false;
-    throw std::invalid_argument("invalid value for bool: " + str);
-}
+    float value;
+    enum class unit_t
+    {
+        ucs,
+        cm,
+        mm,
+        pt,
+        pc,
+        px,
+        pct
+    } unit;
+
+    length();
+    explicit length(float value);
+    explicit length(float value, unit_t unit);
+};
+
+std::ostream& operator<<(std::ostream& os, const length& l);
+std::istream& operator>>(std::istream& is, length& l);
 
 }
 }
 
+#endif /* LENGTH_H_ */

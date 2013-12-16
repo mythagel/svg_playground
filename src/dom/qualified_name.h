@@ -16,29 +16,33 @@
  */
 
 /*
- * types.cpp
+ * qualified_name.h
  *
- *  Created on: 2013-12-05
+ *  Created on: 2013-12-16
  *      Author: nicholas
  */
 
-#include "types.h"
-#include <stdexcept>
+#ifndef QUALIFIED_NAME_H_
+#define QUALIFIED_NAME_H_
+#include <string>
 
-namespace svg
-{
-namespace types
+namespace dom
 {
 
-bool parse_bool(const std::string& str)
+struct qualified_name
 {
-    if(str == "true")
-        return true;
-    else if(str == "false")
-        return false;
-    throw std::invalid_argument("invalid value for bool: " + str);
+    std::string ns;
+    std::string local;
+
+    qualified_name();
+    explicit qualified_name(const std::string& local);
+    qualified_name(const std::string& local, const std::string& ns);
+
+    bool operator==(const qualified_name& name) const;
+    bool operator!=(const qualified_name& name) const;
+    bool operator<(const qualified_name& name) const;
+};
+
 }
 
-}
-}
-
+#endif /* QUALIFIED_NAME_H_ */

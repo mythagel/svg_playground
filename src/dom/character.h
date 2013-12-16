@@ -16,29 +16,38 @@
  */
 
 /*
- * types.cpp
+ * character.h
  *
- *  Created on: 2013-12-05
+ *  Created on: 2013-12-16
  *      Author: nicholas
  */
 
-#include "types.h"
-#include <stdexcept>
+#ifndef CHARACTER_H_
+#define CHARACTER_H_
+#include <memory>
+#include <string>
+#include "node.h"
 
-namespace svg
-{
-namespace types
+namespace dom
 {
 
-bool parse_bool(const std::string& str)
+struct character_t;
+using character = std::shared_ptr<character_t>;
+
+struct character_t : node_t
 {
-    if(str == "true")
-        return true;
-    else if(str == "false")
-        return false;
-    throw std::invalid_argument("invalid value for bool: " + str);
+    std::string data;
+
+    character_t(const std::string& data);
+
+    virtual node append(const node&) override;
+    virtual node insert(const node&, const node&) override;
+    virtual node erase(const node&) override;
+    virtual node clone(bool) override;
+
+    virtual ~character_t();
+};
+
 }
 
-}
-}
-
+#endif /* CHARACTER_H_ */

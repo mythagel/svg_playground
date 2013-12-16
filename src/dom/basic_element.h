@@ -16,27 +16,38 @@
  */
 
 /*
- * types.h
+ * basic_element.h
  *
- *  Created on: 2013-12-05
+ *  Created on: 2013-12-16
  *      Author: nicholas
  */
 
-#ifndef TYPES_H_
-#define TYPES_H_
+#ifndef BASIC_ELEMENT_H_
+#define BASIC_ELEMENT_H_
+#include "element.h"
+#include "qualified_name.h"
+#include <map>
 #include <string>
-#include <vector>
+#include <boost/optional.hpp>
 
-namespace svg
-{
-namespace types
+namespace dom
 {
 
-bool parse_bool(const std::string& str);
+struct basic_element_t : element_t
+{
+    qualified_name element_name;
+    std::map<qualified_name, std::string> attributes;
 
-// std::vector<std::string> parse_string_list(const std::string& str);
+    basic_element_t(const qualified_name& name);
+
+    virtual qualified_name name() const override;
+    virtual boost::optional<std::string> get_attribute(const qualified_name& name) const override;
+    virtual void set_attribute(const qualified_name& name, const boost::optional<std::string>& value) override;
+    virtual node clone(bool deep) override;
+
+    virtual ~basic_element_t();
+};
 
 }
-}
 
-#endif /* TYPES_H_ */
+#endif /* BASIC_ELEMENT_H_ */

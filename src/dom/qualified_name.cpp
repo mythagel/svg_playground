@@ -16,29 +16,41 @@
  */
 
 /*
- * types.cpp
+ * qualified_name.cpp
  *
- *  Created on: 2013-12-05
+ *  Created on: 2013-12-16
  *      Author: nicholas
  */
 
-#include "types.h"
-#include <stdexcept>
+#include "qualified_name.h"
+#include <tuple>
 
-namespace svg
-{
-namespace types
+namespace dom
 {
 
-bool parse_bool(const std::string& str)
+qualified_name::qualified_name()
 {
-    if(str == "true")
-        return true;
-    else if(str == "false")
-        return false;
-    throw std::invalid_argument("invalid value for bool: " + str);
+}
+qualified_name::qualified_name(const std::string& local)
+ : ns(), local(local)
+{
+}
+qualified_name::qualified_name(const std::string& local, const std::string& ns)
+ : ns(ns), local(local)
+{
+}
+
+bool qualified_name::operator==(const qualified_name& name) const
+{
+    return std::tie(ns, local) == std::tie(name.ns, name.local);
+}
+bool qualified_name::operator!=(const qualified_name& name) const
+{
+    return std::tie(ns, local) != std::tie(name.ns, name.local);
+}
+bool qualified_name::operator<(const qualified_name& name) const
+{
+    return std::tie(ns, local) < std::tie(name.ns, name.local);
 }
 
 }
-}
-
