@@ -16,34 +16,45 @@
  */
 
 /*
- * stringlist.cpp
+ * gradient.h
  *
  *  Created on: 2013-12-17
  *      Author: nicholas
  */
 
-#include "stringlist.h"
-#include <ostream>
-#include <istream>
-#include <iterator>
-#include <algorithm>
-#include <string>
+#ifndef GRADIENT_H_
+#define GRADIENT_H_
+#include <boost/variant.hpp>
+#include "colour.h"
+#include <iosfwd>
 
 namespace svg
 {
 namespace types
 {
-
-std::ostream& operator<<(std::ostream& os, const stringlist_t& list)
+namespace gradient
 {
-    std::copy(begin(list.data), end(list.data), std::ostream_iterator<std::string>(os, " "));
-    return os;
-}
-std::istream& operator>>(std::istream& is, stringlist_t& list)
+
+enum class stop_colour_enum_t
 {
-    list.data = std::vector<std::string>(std::istream_iterator<std::string>{is}, std::istream_iterator<std::string>{});
-    return is;
-}
+    inherit
+};
+using stop_colour = boost::variant<stop_colour_enum_t, svg::types::colour>;
+
+enum class stop_opacity_enum_t
+{
+    inherit
+};
+using stop_opacity = boost::variant<stop_opacity_enum_t, float>;
+
+std::ostream& operator<<(std::ostream& os, const stop_colour& v);
+std::istream& operator>>(std::istream& is, stop_colour& v);
+
+std::ostream& operator<<(std::ostream& os, const stop_opacity& v);
+std::istream& operator>>(std::istream& is, stop_opacity& v);
 
 }
 }
+}
+
+#endif /* GRADIENT_H_ */

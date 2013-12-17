@@ -25,6 +25,7 @@
 #include "bidi.h"
 #include <ostream>
 #include <istream>
+#include <string>
 #include <stdexcept>
 
 namespace svg

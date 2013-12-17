@@ -16,34 +16,48 @@
  */
 
 /*
- * stringlist.cpp
+ * flowable_text.h
  *
  *  Created on: 2013-12-17
  *      Author: nicholas
  */
 
-#include "stringlist.h"
-#include <ostream>
-#include <istream>
-#include <iterator>
-#include <algorithm>
-#include <string>
+#ifndef FLOWABLE_TEXT_H_
+#define FLOWABLE_TEXT_H_
+#include <boost/variant.hpp>
+#include <iosfwd>
 
 namespace svg
 {
 namespace types
 {
-
-std::ostream& operator<<(std::ostream& os, const stringlist_t& list)
+namespace flowable_text
 {
-    std::copy(begin(list.data), end(list.data), std::ostream_iterator<std::string>(os, " "));
-    return os;
-}
-std::istream& operator>>(std::istream& is, stringlist_t& list)
+
+enum class display_align
 {
-    list.data = std::vector<std::string>(std::istream_iterator<std::string>{is}, std::istream_iterator<std::string>{});
-    return is;
-}
+    _auto,
+    before,
+    center,
+    after,
+    inherit
+};
+
+enum class line_increment_enum_t
+{
+    _auto,
+    inherit
+};
+using line_increment = boost::variant<line_increment_enum_t, float>;
+
+std::ostream& operator<<(std::ostream& os, display_align v);
+std::istream& operator>>(std::istream& is, display_align& v);
+
+std::ostream& operator<<(std::ostream& os, const line_increment& v);
+std::istream& operator>>(std::istream& is, line_increment& v);
 
 }
 }
+}
+
+#endif /* FLOWABLE_TEXT_H_ */

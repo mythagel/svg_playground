@@ -16,34 +16,43 @@
  */
 
 /*
- * stringlist.cpp
+ * gradient.cpp
  *
  *  Created on: 2013-12-17
  *      Author: nicholas
  */
 
-#include "stringlist.h"
+#include "gradient.h"
 #include <ostream>
 #include <istream>
-#include <iterator>
-#include <algorithm>
 #include <string>
+#include <stdexcept>
 
 namespace svg
 {
 namespace types
 {
-
-std::ostream& operator<<(std::ostream& os, const stringlist_t& list)
+namespace gradient
 {
-    std::copy(begin(list.data), end(list.data), std::ostream_iterator<std::string>(os, " "));
+
+std::ostream& operator<<(std::ostream& os, const stop_colour& v)
+{
     return os;
 }
-std::istream& operator>>(std::istream& is, stringlist_t& list)
+std::istream& operator>>(std::istream& is, stop_colour& v)
 {
-    list.data = std::vector<std::string>(std::istream_iterator<std::string>{is}, std::istream_iterator<std::string>{});
     return is;
 }
 
+std::ostream& operator<<(std::ostream& os, const stop_opacity& v)
+{
+    return os;
+}
+std::istream& operator>>(std::istream& is, stop_opacity& v)
+{
+    return is;
+}
+
+}
 }
 }

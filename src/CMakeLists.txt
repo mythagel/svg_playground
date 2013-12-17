@@ -7,6 +7,10 @@ types/stringlist.cpp
 types/core.cpp
 types/media.cpp
 types/bidi.cpp
+types/flowable_text.cpp
+types/gradient.cpp
+types/opacity.cpp
+types/paint.cpp
 
 types/parsers/basic.cpp
 types/parsers/path.cpp

@@ -22,6 +22,10 @@
 #include "types/core.h"
 #include "types/media.h"
 #include "types/bidi.h"
+#include "types/flowable_text.h"
+#include "types/gradient.h"
+#include "types/opacity.h"
+#include "types/paint.h"
 
 #include "dom/qualified_name.h"
 #include "dom/node.h"
@@ -63,106 +67,16 @@ struct media_t;
 struct properties_t
 {
     std::unique_ptr<bidi_t> bidi;
-
-    enum class display_align_t
-    {
-        _auto,
-        before,
-        center,
-        after,
-        inherit
-    };
-    boost::optional<display_align_t> display_align;
-
-    enum class line_increment_enum_t
-    {
-        _auto,
-        inherit
-    };
-    using line_increment_t = boost::variant<line_increment_enum_t, float>;
-    boost::optional<line_increment_t> line_increment;
-
-    enum class stop_colour_enum_t
-    {
-        inherit
-    };
-    using stop_colour_t = boost::variant<stop_colour_enum_t, svg::types::colour>;
-    boost::optional<stop_colour_t> stop_colour;
-
-    enum class stop_opacity_enum_t
-    {
-        inherit
-    };
-    using stop_opacity_t = boost::variant<stop_opacity_enum_t, float>;
-    boost::optional<stop_opacity_t> stop_opacity;
-
+    boost::optional<types::flowable_text::display_align> display_align;
+    boost::optional<types::flowable_text::line_increment> line_increment;
+    boost::optional<types::gradient::stop_colour> stop_colour;
+    boost::optional<types::gradient::stop_opacity> stop_opacity;
     std::unique_ptr<attr::media_t> media;
-
-    enum class fill_opacity_enum_t
-    {
-        inherit
-    };
-    using fill_opacity_t = boost::variant<fill_opacity_enum_t, float>;
-    boost::optional<fill_opacity_t> fill_opacity;
-
-    enum class stroke_opacity_enum_t
-    {
-        inherit
-    };
-    using stroke_opacity_t = boost::variant<stroke_opacity_enum_t, float>;
-    boost::optional<stroke_opacity_t> stroke_opacity;
-
-    enum class paint_enum_t
-    {
-        none,
-        currentColor,
-        inherit
-    };
-    enum class system_paint_t
-    {
-        ActiveBorder,
-        ActiveCaption,
-        AppWorkspace,
-        Background,
-        ButtonFace,
-        ButtonHighlight,
-        ButtonShadow,
-        ButtonText,
-        CaptionText,
-        GrayText,
-        Highlight,
-        HighlightText,
-        InactiveBorder,
-        InactiveCaption,
-        InactiveCaptionText,
-        InfoBackground,
-        InfoText,
-        Menu,
-        MenuText,
-        Scrollbar,
-        ThreeDDarkShadow,
-        ThreeDFace,
-        ThreeDHighlight,
-        ThreeDLightShadow,
-        ThreeDShadow,
-        Window,
-        WindowFrame,
-        WindowText
-    };
-
-    using paint_t = boost::variant<paint_enum_t, svg::types::colour, network::uri/*<FuncIRI> [ none | currentColor | <color>]*/, system_paint_t>;
-
-    boost::optional<paint_t> fill;
-
-    enum class fill_rule_t
-    {
-        inherit,
-        nonzero,
-        evenodd
-    };
-    boost::optional<fill_rule_t> fill_rule;
-
-    boost::optional<paint_t> stroke;
+    boost::optional<types::opacity::fill_opacity> fill_opacity;
+    boost::optional<types::opacity::stroke_opacity> stroke_opacity;
+    boost::optional<types::paint::paint> fill;
+    boost::optional<types::paint::fill_rule> fill_rule;
+    boost::optional<types::paint::paint> stroke;
 
     // TODO listof<T> as T (comma-wsp T)*
 };

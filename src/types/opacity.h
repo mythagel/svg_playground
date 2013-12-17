@@ -16,34 +16,44 @@
  */
 
 /*
- * stringlist.cpp
+ * opacity.h
  *
  *  Created on: 2013-12-17
  *      Author: nicholas
  */
 
-#include "stringlist.h"
-#include <ostream>
-#include <istream>
-#include <iterator>
-#include <algorithm>
-#include <string>
+#ifndef OPACITY_H_
+#define OPACITY_H_
+#include <boost/variant.hpp>
+#include <iosfwd>
 
 namespace svg
 {
 namespace types
 {
-
-std::ostream& operator<<(std::ostream& os, const stringlist_t& list)
+namespace opacity
 {
-    std::copy(begin(list.data), end(list.data), std::ostream_iterator<std::string>(os, " "));
-    return os;
-}
-std::istream& operator>>(std::istream& is, stringlist_t& list)
+
+enum class fill_opacity_enum_t
 {
-    list.data = std::vector<std::string>(std::istream_iterator<std::string>{is}, std::istream_iterator<std::string>{});
-    return is;
-}
+    inherit
+};
+using fill_opacity = boost::variant<fill_opacity_enum_t, float>;
+
+enum class stroke_opacity_enum_t
+{
+    inherit
+};
+using stroke_opacity = boost::variant<stroke_opacity_enum_t, float>;
+
+std::ostream& operator<<(std::ostream& os, const fill_opacity& v);
+std::istream& operator>>(std::istream& is, fill_opacity& v);
+
+std::ostream& operator<<(std::ostream& os, const stroke_opacity& v);
+std::istream& operator>>(std::istream& is, stroke_opacity& v);
 
 }
 }
+}
+
+#endif /* OPACITY_H_ */
