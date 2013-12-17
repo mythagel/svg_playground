@@ -16,18 +16,49 @@
  */
 
 /*
- * element.cpp
+ * node.cpp
  *
  *  Created on: 2013-12-16
  *      Author: nicholas
  */
 
-#include "element.h"
+#include "dom/node.h"
+#include <algorithm>
 
 namespace dom
 {
 
-element_t::~element_t()
+node node_t::append(const node& child)
+{
+    auto it = std::find(begin(children), end(children), child);
+    if(it != end(children))
+        children.erase(it);
+
+    child->parent = shared_from_this();
+    children.push_back(child);
+    return child;
+}
+
+node node_t::insert(const node& child, const node& ref)
+{
+    auto it = std::find(begin(children), end(children), ref);
+
+    child->parent = shared_from_this();
+    children.insert(it, child);
+    return child;
+}
+
+node node_t::erase(const node& child)
+{
+    auto it = std::find(begin(children), end(children), child);
+    if(it != end(children))
+        children.erase(it);
+
+    child->parent.reset();
+    return child;
+}
+
+node_t::~node_t()
 {
 }
 

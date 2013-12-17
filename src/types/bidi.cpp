@@ -77,7 +77,7 @@ std::ostream& operator<<(std::ostream& os, unicode_bidi v)
             os << "embed";
             break;
         case unicode_bidi::bidi_override:
-            os << "bidi_override";
+            os << "bidi-override";
             break;
         case unicode_bidi::inherit:
             os << "inherit";
@@ -93,7 +93,7 @@ std::istream& operator>>(std::istream& is, unicode_bidi& v)
         v = unicode_bidi::normal;
     else if(tok == "embed")
         v = unicode_bidi::embed;
-    else if(tok == "bidi_override")
+    else if(tok == "bidi-override")
         v = unicode_bidi::bidi_override;
     else if(tok == "inherit")
         v = unicode_bidi::inherit;

@@ -16,49 +16,46 @@
  */
 
 /*
- * node.cpp
+ * character.cpp
  *
  *  Created on: 2013-12-16
  *      Author: nicholas
  */
 
-#include "node.h"
-#include <algorithm>
+#include "dom/character.h"
+#include <stdexcept>
 
 namespace dom
 {
 
-node node_t::append(const node& child)
+character_t::character_t(const std::string& data)
+ : data(data)
 {
-    auto it = std::find(begin(children), end(children), child);
-    if(it != end(children))
-        children.erase(it);
-
-    child->parent = shared_from_this();
-    children.push_back(child);
-    return child;
 }
 
-node node_t::insert(const node& child, const node& ref)
+node character_t::append(const node&)
 {
-    auto it = std::find(begin(children), end(children), ref);
-
-    child->parent = shared_from_this();
-    children.insert(it, child);
-    return child;
+    throw std::runtime_error("character node cannot have children.");
 }
 
-node node_t::erase(const node& child)
+node character_t::insert(const node&, const node&)
 {
-    auto it = std::find(begin(children), end(children), child);
-    if(it != end(children))
-        children.erase(it);
-
-    child->parent.reset();
-    return child;
+    throw std::runtime_error("character node cannot have children.");
 }
 
-node_t::~node_t()
+node character_t::erase(const node&)
+{
+    throw std::runtime_error("character node cannot have children.");
+}
+
+node character_t::clone(bool)
+{
+    auto dup = std::make_shared<character_t>(*this);
+    dup->parent.reset();
+    return dup;
+}
+
+character_t::~character_t()
 {
 }
 

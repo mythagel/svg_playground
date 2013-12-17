@@ -23,6 +23,10 @@
  */
 
 #include "paint.h"
+#include <ostream>
+#include <istream>
+#include <string>
+#include <stdexcept>
 
 namespace svg
 {
@@ -225,6 +229,150 @@ std::istream& operator>>(std::istream& is, fill_rule& v)
         v = fill_rule::evenodd;
     else
         throw std::invalid_argument("unrecognised value for fill-rule: " + tok);
+    return is;
+}
+
+std::ostream& operator<<(std::ostream& os, const stroke_dash_offset& v)
+{
+    return os;
+}
+std::istream& operator>>(std::istream& is, stroke_dash_offset& v)
+{
+    return is;
+}
+
+std::ostream& operator<<(std::ostream& os, stroke_linecap v)
+{
+    switch(v)
+    {
+        case stroke_linecap::butt:
+            os << "butt";
+            break;
+        case stroke_linecap::round:
+            os << "round";
+            break;
+        case stroke_linecap::square:
+            os << "square";
+            break;
+        case stroke_linecap::inherit:
+            os << "inherit";
+            break;
+    }
+    return os;
+}
+std::istream& operator>>(std::istream& is, stroke_linecap& v)
+{
+    std::string tok;
+    is >> tok;
+    if(tok == "butt")
+        v = stroke_linecap::butt;
+    else if(tok == "round")
+        v = stroke_linecap::round;
+    else if(tok == "square")
+        v = stroke_linecap::square;
+    else if(tok == "inherit")
+        v = stroke_linecap::inherit;
+    else
+        throw std::invalid_argument("unrecognised value for stroke-linecap: " + tok);
+    return is;
+}
+
+std::ostream& operator<<(std::ostream& os, stroke_linejoin v)
+{
+    switch(v)
+    {
+        case stroke_linejoin::miter:
+            os << "miter";
+            break;
+        case stroke_linejoin::round:
+            os << "round";
+            break;
+        case stroke_linejoin::bevel:
+            os << "bevel";
+            break;
+        case stroke_linejoin::inherit:
+            os << "inherit";
+            break;
+    }
+    return os;
+}
+std::istream& operator>>(std::istream& is, stroke_linejoin& v)
+{
+    std::string tok;
+    is >> tok;
+    if(tok == "miter")
+        v = stroke_linejoin::miter;
+    else if(tok == "round")
+        v = stroke_linejoin::round;
+    else if(tok == "bevel")
+        v = stroke_linejoin::bevel;
+    else if(tok == "inherit")
+        v = stroke_linejoin::inherit;
+    else
+        throw std::invalid_argument("unrecognised value for stroke-linejoin: " + tok);
+    return is;
+}
+
+std::ostream& operator<<(std::ostream& os, const stroke_miter_limit& v)
+{
+    return os;
+}
+std::istream& operator>>(std::istream& is, stroke_miter_limit& v)
+{
+    return is;
+}
+
+std::ostream& operator<<(std::ostream& os, const stroke_width& v)
+{
+    return os;
+}
+std::istream& operator>>(std::istream& is, stroke_width& v)
+{
+    return is;
+}
+
+std::ostream& operator<<(std::ostream& os, const color& v)
+{
+    return os;
+}
+std::istream& operator>>(std::istream& is, color& v)
+{
+    return is;
+}
+
+std::ostream& operator<<(std::ostream& os, color_rendering v)
+{
+    switch(v)
+    {
+        case color_rendering::_auto:
+            os << "auto";
+            break;
+        case color_rendering::optimizeSpeed:
+            os << "optimizeSpeed";
+            break;
+        case color_rendering::optimizeQuality:
+            os << "optimizeQuality";
+            break;
+        case color_rendering::inherit:
+            os << "inherit";
+            break;
+    }
+    return os;
+}
+std::istream& operator>>(std::istream& is, color_rendering& v)
+{
+    std::string tok;
+    is >> tok;
+    if(tok == "auto")
+        v = color_rendering::_auto;
+    else if(tok == "optimizeSpeed")
+        v = color_rendering::optimizeSpeed;
+    else if(tok == "optimizeQuality")
+        v = color_rendering::optimizeQuality;
+    else if(tok == "inherit")
+        v = color_rendering::inherit;
+    else
+        throw std::invalid_argument("unrecognised value for color-rendering: " + tok);
     return is;
 }
 

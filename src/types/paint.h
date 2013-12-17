@@ -26,6 +26,7 @@
 #define PAINT_H_
 #include <boost/variant.hpp>
 #include "colour.h"
+#include "length.h"
 #include <string>
 #include <iosfwd>
 
@@ -74,13 +75,63 @@ enum class paint_enum_t
     currentColor,
     inherit
 };
-using paint = boost::variant<paint_enum_t, svg::types::colour, std::string/*<FuncIRI> [ none | currentColor | <color>]*/, system_paint>;
+using paint = boost::variant<paint_enum_t, types::colour, std::string/*<FuncIRI> [ none | currentColor | <color>]*/, system_paint>;
 
 enum class fill_rule
 {
     inherit,
     nonzero,
     evenodd
+};
+
+//stroke-dasharray
+
+enum class stroke_dash_offset_enum_t
+{
+    inherit
+};
+using stroke_dash_offset = boost::variant<stroke_dash_offset_enum_t, types::length>;
+
+enum class stroke_linecap
+{
+    butt,
+    round,
+    square,
+    inherit
+};
+
+enum class stroke_linejoin
+{
+    miter,
+    round,
+    bevel,
+    inherit
+};
+
+enum class stroke_miter_limit_enum_t
+{
+    inherit
+};
+using stroke_miter_limit = boost::variant<stroke_miter_limit_enum_t, float>;
+
+enum class stroke_width_enum_t
+{
+    inherit
+};
+using stroke_width = boost::variant<stroke_width_enum_t, types::length>;
+
+enum class color_enum_t
+{
+    inherit
+};
+using color = boost::variant<color_enum_t, types::colour>;
+
+enum class color_rendering
+{
+    _auto,
+    optimizeSpeed,
+    optimizeQuality,
+    inherit
 };
 
 std::ostream& operator<<(std::ostream& os, system_paint v);
@@ -91,6 +142,27 @@ std::istream& operator>>(std::istream& is, paint& v);
 
 std::ostream& operator<<(std::ostream& os, fill_rule v);
 std::istream& operator>>(std::istream& is, fill_rule& v);
+
+std::ostream& operator<<(std::ostream& os, const stroke_dash_offset& v);
+std::istream& operator>>(std::istream& is, stroke_dash_offset& v);
+
+std::ostream& operator<<(std::ostream& os, stroke_linecap v);
+std::istream& operator>>(std::istream& is, stroke_linecap& v);
+
+std::ostream& operator<<(std::ostream& os, stroke_linejoin v);
+std::istream& operator>>(std::istream& is, stroke_linejoin& v);
+
+std::ostream& operator<<(std::ostream& os, const stroke_miter_limit& v);
+std::istream& operator>>(std::istream& is, stroke_miter_limit& v);
+
+std::ostream& operator<<(std::ostream& os, const stroke_width& v);
+std::istream& operator>>(std::istream& is, stroke_width& v);
+
+std::ostream& operator<<(std::ostream& os, const color& v);
+std::istream& operator>>(std::istream& is, color& v);
+
+std::ostream& operator<<(std::ostream& os, color_rendering v);
+std::istream& operator>>(std::istream& is, color_rendering& v);
 
 }
 }

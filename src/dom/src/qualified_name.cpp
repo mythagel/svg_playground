@@ -22,7 +22,7 @@
  *      Author: nicholas
  */
 
-#include "qualified_name.h"
+#include "dom/qualified_name.h"
 #include <tuple>
 
 namespace dom

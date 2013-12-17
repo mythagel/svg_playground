@@ -16,46 +16,18 @@
  */
 
 /*
- * character.cpp
+ * element.cpp
  *
  *  Created on: 2013-12-16
  *      Author: nicholas
  */
 
-#include "character.h"
-#include <stdexcept>
+#include "dom/element.h"
 
 namespace dom
 {
 
-character_t::character_t(const std::string& data)
- : data(data)
-{
-}
-
-node character_t::append(const node&)
-{
-    throw std::runtime_error("character node cannot have children.");
-}
-
-node character_t::insert(const node&, const node&)
-{
-    throw std::runtime_error("character node cannot have children.");
-}
-
-node character_t::erase(const node&)
-{
-    throw std::runtime_error("character node cannot have children.");
-}
-
-node character_t::clone(bool)
-{
-    auto dup = std::make_shared<character_t>(*this);
-    dup->parent.reset();
-    return dup;
-}
-
-character_t::~character_t()
+element_t::~element_t()
 {
 }
 
