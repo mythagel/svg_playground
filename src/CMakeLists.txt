@@ -1,7 +1,7 @@
 
 add_subdirectory(dom)
 
-include_directories(dom/include)
+include_directories(dom/include ${PROJECT_SOURCE_DIR}/deps/uri/src)
 
 add_library(svg STATIC document.cpp svg.cpp attr.cpp
 
@@ -18,10 +18,14 @@ types/paint.cpp
 types/solidcolour.cpp
 types/text.cpp
 types/vectoreffects.cpp
+types/focus.cpp
+types/animate.cpp
+types/clock_value.cpp
+types/aspect_ratio.cpp
 
 types/parsers/basic.cpp
 types/parsers/path.cpp
 types/parsers/transform.cpp
 
 )
-target_link_libraries(svg dom)
+target_link_libraries(svg dom network-uri)

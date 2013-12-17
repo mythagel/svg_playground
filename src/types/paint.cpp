@@ -232,11 +232,11 @@ std::istream& operator>>(std::istream& is, fill_rule& v)
     return is;
 }
 
-std::ostream& operator<<(std::ostream& os, const stroke_dash_offset& v)
+std::ostream& operator<<(std::ostream& os, const stroke_dashoffset& v)
 {
     return os;
 }
-std::istream& operator>>(std::istream& is, stroke_dash_offset& v)
+std::istream& operator>>(std::istream& is, stroke_dashoffset& v)
 {
     return is;
 }
@@ -313,11 +313,11 @@ std::istream& operator>>(std::istream& is, stroke_linejoin& v)
     return is;
 }
 
-std::ostream& operator<<(std::ostream& os, const stroke_miter_limit& v)
+std::ostream& operator<<(std::ostream& os, const stroke_miterlimit& v)
 {
     return os;
 }
-std::istream& operator>>(std::istream& is, stroke_miter_limit& v)
+std::istream& operator>>(std::istream& is, stroke_miterlimit& v)
 {
     return is;
 }

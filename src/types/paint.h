@@ -75,7 +75,7 @@ enum class paint_enum_t
     currentColor,
     inherit
 };
-using paint = boost::variant<paint_enum_t, types::colour, std::string/*<FuncIRI> [ none | currentColor | <color>]*/, system_paint>;
+using paint = boost::variant<paint_enum_t, colour, std::string/*<FuncIRI> [ none | currentColor | <color>]*/, system_paint>;
 
 enum class fill_rule
 {
@@ -86,11 +86,11 @@ enum class fill_rule
 
 //stroke-dasharray
 
-enum class stroke_dash_offset_enum_t
+enum class stroke_dashoffset_enum_t
 {
     inherit
 };
-using stroke_dash_offset = boost::variant<stroke_dash_offset_enum_t, types::length>;
+using stroke_dashoffset = boost::variant<stroke_dashoffset_enum_t, length>;
 
 enum class stroke_linecap
 {
@@ -108,17 +108,17 @@ enum class stroke_linejoin
     inherit
 };
 
-enum class stroke_miter_limit_enum_t
+enum class stroke_miterlimit_enum_t
 {
     inherit
 };
-using stroke_miter_limit = boost::variant<stroke_miter_limit_enum_t, float>;
+using stroke_miterlimit = boost::variant<stroke_miterlimit_enum_t, float>;
 
 enum class stroke_width_enum_t
 {
     inherit
 };
-using stroke_width = boost::variant<stroke_width_enum_t, types::length>;
+using stroke_width = boost::variant<stroke_width_enum_t, length>;
 
 enum class color_enum_t
 {
@@ -143,8 +143,8 @@ std::istream& operator>>(std::istream& is, paint& v);
 std::ostream& operator<<(std::ostream& os, fill_rule v);
 std::istream& operator>>(std::istream& is, fill_rule& v);
 
-std::ostream& operator<<(std::ostream& os, const stroke_dash_offset& v);
-std::istream& operator>>(std::istream& is, stroke_dash_offset& v);
+std::ostream& operator<<(std::ostream& os, const stroke_dashoffset& v);
+std::istream& operator>>(std::istream& is, stroke_dashoffset& v);
 
 std::ostream& operator<<(std::ostream& os, stroke_linecap v);
 std::istream& operator>>(std::istream& is, stroke_linecap& v);
@@ -152,8 +152,8 @@ std::istream& operator>>(std::istream& is, stroke_linecap& v);
 std::ostream& operator<<(std::ostream& os, stroke_linejoin v);
 std::istream& operator>>(std::istream& is, stroke_linejoin& v);
 
-std::ostream& operator<<(std::ostream& os, const stroke_miter_limit& v);
-std::istream& operator>>(std::istream& is, stroke_miter_limit& v);
+std::ostream& operator<<(std::ostream& os, const stroke_miterlimit& v);
+std::istream& operator>>(std::istream& is, stroke_miterlimit& v);
 
 std::ostream& operator<<(std::ostream& os, const stroke_width& v);
 std::istream& operator>>(std::istream& is, stroke_width& v);

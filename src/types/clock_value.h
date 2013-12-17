@@ -16,46 +16,39 @@
  */
 
 /*
- * solidcolour.h
+ * clock_value.h
  *
  *  Created on: 2013-12-17
  *      Author: nicholas
  */
 
-#ifndef SOLIDCOLOUR_H_
-#define SOLIDCOLOUR_H_
-#include <boost/variant.hpp>
-#include "colour.h"
+#ifndef CLOCK_VALUE_H_
+#define CLOCK_VALUE_H_
 #include <iosfwd>
 
 namespace svg
 {
 namespace types
 {
-namespace solidcolour
-{
 
-enum class solid_color_enum_t
+struct clock_value
 {
-    inherit
+    float value;
+    enum class unit_t
+    {
+        s,
+        ms
+    } unit;
+
+    clock_value();
+    explicit clock_value(float value);
+    explicit clock_value(float value, unit_t unit);
 };
-using solid_color = boost::variant<solid_color_enum_t, colour>;
 
-
-enum class solid_opacity_enum_t
-{
-    inherit
-};
-using solid_opacity = boost::variant<solid_opacity_enum_t, float>;
-
-std::ostream& operator<<(std::ostream& os, const solid_color& v);
-std::istream& operator>>(std::istream& is, solid_color& v);
-
-std::ostream& operator<<(std::ostream& os, const solid_opacity& v);
-std::istream& operator>>(std::istream& is, solid_opacity& v);
+std::ostream& operator<<(std::ostream& os, const clock_value& l);
+std::istream& operator>>(std::istream& is, clock_value& l);
 
 }
 }
-}
 
-#endif /* SOLIDCOLOUR_H_ */
+#endif /* CLOCK_VALUE_H_ */

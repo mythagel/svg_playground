@@ -16,46 +16,48 @@
  */
 
 /*
- * solidcolour.h
+ * animate.h
  *
  *  Created on: 2013-12-17
  *      Author: nicholas
  */
 
-#ifndef SOLIDCOLOUR_H_
-#define SOLIDCOLOUR_H_
-#include <boost/variant.hpp>
-#include "colour.h"
+#ifndef ANIMATE_H_
+#define ANIMATE_H_
 #include <iosfwd>
+#include <boost/variant.hpp>
+#include <string>
+#include "clock_value.h"
 
 namespace svg
 {
 namespace types
 {
-namespace solidcolour
+namespace animate
 {
 
-enum class solid_color_enum_t
+enum class syncBehaviorDefault
+{
+    canSlip,
+    locked,
+    independent,
+    inherit
+};
+
+enum class syncToleranceDefault_enum_t
 {
     inherit
 };
-using solid_color = boost::variant<solid_color_enum_t, colour>;
+using syncToleranceDefault = boost::variant<syncToleranceDefault_enum_t, clock_value>;
 
+std::ostream& operator<<(std::ostream& os, syncBehaviorDefault v);
+std::istream& operator>>(std::istream& is, syncBehaviorDefault& v);
 
-enum class solid_opacity_enum_t
-{
-    inherit
-};
-using solid_opacity = boost::variant<solid_opacity_enum_t, float>;
-
-std::ostream& operator<<(std::ostream& os, const solid_color& v);
-std::istream& operator>>(std::istream& is, solid_color& v);
-
-std::ostream& operator<<(std::ostream& os, const solid_opacity& v);
-std::istream& operator>>(std::istream& is, solid_opacity& v);
+std::ostream& operator<<(std::ostream& os, const syncToleranceDefault& v);
+std::istream& operator>>(std::istream& is, syncToleranceDefault& v);
 
 }
 }
 }
 
-#endif /* SOLIDCOLOUR_H_ */
+#endif /* ANIMATE_H_ */

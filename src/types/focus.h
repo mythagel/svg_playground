@@ -16,46 +16,45 @@
  */
 
 /*
- * solidcolour.h
+ * focus.h
  *
  *  Created on: 2013-12-17
  *      Author: nicholas
  */
 
-#ifndef SOLIDCOLOUR_H_
-#define SOLIDCOLOUR_H_
+#ifndef FOCUS_H_
+#define FOCUS_H_
 #include <boost/variant.hpp>
-#include "colour.h"
 #include <iosfwd>
 
 namespace svg
 {
 namespace types
 {
-namespace solidcolour
+namespace focus
 {
 
-enum class solid_color_enum_t
+enum class focusHighlight
 {
-    inherit
+    _auto,
+    none
 };
-using solid_color = boost::variant<solid_color_enum_t, colour>;
 
-
-enum class solid_opacity_enum_t
+enum class navigation_enum_t
 {
-    inherit
+    _auto,
+    self
 };
-using solid_opacity = boost::variant<solid_opacity_enum_t, float>;
+using navigation = boost::variant<navigation_enum_t, std::string/*FuncIRI*/>;
 
-std::ostream& operator<<(std::ostream& os, const solid_color& v);
-std::istream& operator>>(std::istream& is, solid_color& v);
+std::ostream& operator<<(std::ostream& os, focusHighlight v);
+std::istream& operator>>(std::istream& is, focusHighlight& v);
 
-std::ostream& operator<<(std::ostream& os, const solid_opacity& v);
-std::istream& operator>>(std::istream& is, solid_opacity& v);
+std::ostream& operator<<(std::ostream& os, const navigation& v);
+std::istream& operator>>(std::istream& is, navigation& v);
 
 }
 }
 }
 
-#endif /* SOLIDCOLOUR_H_ */
+#endif /* FOCUS_H_ */

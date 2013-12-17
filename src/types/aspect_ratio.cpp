@@ -16,46 +16,34 @@
  */
 
 /*
- * solidcolour.h
+ * aspect_ratio.cpp
  *
  *  Created on: 2013-12-17
  *      Author: nicholas
  */
 
-#ifndef SOLIDCOLOUR_H_
-#define SOLIDCOLOUR_H_
-#include <boost/variant.hpp>
-#include "colour.h"
-#include <iosfwd>
+#include "aspect_ratio.h"
+#include <ostream>
+#include <istream>
+#include <string>
+#include <stdexcept>
 
 namespace svg
 {
 namespace types
 {
-namespace solidcolour
+namespace aspect_ratio
 {
 
-enum class solid_color_enum_t
+std::ostream& operator<<(std::ostream& os, const preserveAspectRatio& v)
 {
-    inherit
-};
-using solid_color = boost::variant<solid_color_enum_t, colour>;
-
-
-enum class solid_opacity_enum_t
+    return os;
+}
+std::istream& operator>>(std::istream& is, preserveAspectRatio& v)
 {
-    inherit
-};
-using solid_opacity = boost::variant<solid_opacity_enum_t, float>;
-
-std::ostream& operator<<(std::ostream& os, const solid_color& v);
-std::istream& operator>>(std::istream& is, solid_color& v);
-
-std::ostream& operator<<(std::ostream& os, const solid_opacity& v);
-std::istream& operator>>(std::istream& is, solid_opacity& v);
+    return is;
+}
 
 }
 }
 }
-
-#endif /* SOLIDCOLOUR_H_ */

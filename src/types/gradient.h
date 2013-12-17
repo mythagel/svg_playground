@@ -39,7 +39,7 @@ enum class stop_colour_enum_t
 {
     inherit
 };
-using stop_colour = boost::variant<stop_colour_enum_t, svg::types::colour>;
+using stop_colour = boost::variant<stop_colour_enum_t, colour>;
 
 enum class stop_opacity_enum_t
 {

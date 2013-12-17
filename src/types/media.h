@@ -123,7 +123,7 @@ enum class viewport_fill_enum_t
     inherit,
     none
 };
-using viewport_fill = boost::variant<viewport_fill_enum_t, types::colour>;
+using viewport_fill = boost::variant<viewport_fill_enum_t, colour>;
 
 enum class viewport_fill_opacity_enum_t
 {
