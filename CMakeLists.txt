@@ -13,5 +13,6 @@ ENDIF()
 #add_executable(xerces_basic xerces.cpp)
 #target_link_libraries(xerces_basic xerces-c)
 
+add_subdirectory(deps)
 add_subdirectory(src)
 ADD_SUBDIRECTORY(test)
