@@ -16,46 +16,45 @@
  */
 
 /*
- * focus.h
+ * func_iri.cpp
  *
  *  Created on: 2013-12-17
  *      Author: nicholas
  */
 
-#ifndef FOCUS_H_
-#define FOCUS_H_
-#include <boost/variant.hpp>
-#include <iosfwd>
 #include "func_iri.h"
+#include <ostream>
+#include <istream>
+#include <iterator>
+#include <stdexcept>
 
 namespace svg
 {
 namespace types
 {
-namespace focus
+
+std::ostream& operator<<(std::ostream& os, const func_iri& iri)
 {
-
-enum class focusHighlight
+    os << "url(" << iri << ")";
+    return os;
+}
+std::istream& operator>>(std::istream& is, func_iri& iri)
 {
-    _auto,
-    none
-};
+    is >> std::noskipws;
+    auto begin = std::istreambuf_iterator<char>{is};
+    auto end = std::istreambuf_iterator<char>{};
 
-enum class navigation_enum_t
-{
-    _auto,
-    self
-};
-using navigation = boost::variant<navigation_enum_t, func_iri>;
-
-std::ostream& operator<<(std::ostream& os, focusHighlight v);
-std::istream& operator>>(std::istream& is, focusHighlight& v);
-
-std::ostream& operator<<(std::ostream& os, const navigation& v);
-std::istream& operator>>(std::istream& is, navigation& v);
+    char tag[] = {'u', 'r', 'l', '('};
+    auto it = std::search(begin, end, std::begin(tag), std::end(tag));
+    if(it != begin)
+        throw std::invalid_argument("expected func-iri");
+    is >> iri.iri;
+    char c;
+    is >> c;
+    if(c != ')')
+        throw std::invalid_argument("expected func-iri");
+    return is;
+}
 
 }
 }
-}
-
-#endif /* FOCUS_H_ */

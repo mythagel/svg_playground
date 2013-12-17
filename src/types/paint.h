@@ -27,6 +27,7 @@
 #include <boost/variant.hpp>
 #include "colour.h"
 #include "length.h"
+#include "func_iri.h"
 #include <string>
 #include <iosfwd>
 
@@ -75,7 +76,17 @@ enum class paint_enum_t
     currentColor,
     inherit
 };
-using paint = boost::variant<paint_enum_t, colour, std::string/*<FuncIRI> [ none | currentColor | <color>]*/, system_paint>;
+struct paint_iri
+{
+    func_iri iri;
+    enum fallback_enum_t
+    {
+        none,
+        currentColor
+    };
+    boost::variant<fallback_enum_t, colour> fallback;
+};
+using paint = boost::variant<paint_enum_t, colour, paint_iri, system_paint>;
 
 enum class fill_rule
 {

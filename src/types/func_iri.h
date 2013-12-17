@@ -16,46 +16,31 @@
  */
 
 /*
- * focus.h
+ * func_iri.h
  *
  *  Created on: 2013-12-17
  *      Author: nicholas
  */
 
-#ifndef FOCUS_H_
-#define FOCUS_H_
-#include <boost/variant.hpp>
+#ifndef FUNC_IRI_H_
+#define FUNC_IRI_H_
+#include "network/uri.hpp"
 #include <iosfwd>
-#include "func_iri.h"
 
 namespace svg
 {
 namespace types
 {
-namespace focus
-{
 
-enum class focusHighlight
+struct func_iri
 {
-    _auto,
-    none
+    network::uri iri;
 };
 
-enum class navigation_enum_t
-{
-    _auto,
-    self
-};
-using navigation = boost::variant<navigation_enum_t, func_iri>;
-
-std::ostream& operator<<(std::ostream& os, focusHighlight v);
-std::istream& operator>>(std::istream& is, focusHighlight& v);
-
-std::ostream& operator<<(std::ostream& os, const navigation& v);
-std::istream& operator>>(std::istream& is, navigation& v);
+std::ostream& operator<<(std::ostream& os, const func_iri& iri);
+std::istream& operator>>(std::istream& is, func_iri& iri);
 
 }
 }
-}
 
-#endif /* FOCUS_H_ */
+#endif /* FUNC_IRI_H_ */

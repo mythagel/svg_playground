@@ -22,6 +22,7 @@ types/focus.cpp
 types/animate.cpp
 types/clock_value.cpp
 types/aspect_ratio.cpp
+types/func_iri.cpp
 
 types/parsers/basic.cpp
 types/parsers/path.cpp
