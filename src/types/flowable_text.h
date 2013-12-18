@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef FLOWABLE_TEXT_H_
-#define FLOWABLE_TEXT_H_
+#ifndef TYPES_FLOWABLE_TEXT_H_
+#define TYPES_FLOWABLE_TEXT_H_
 #include <boost/variant.hpp>
 #include <iosfwd>
 
@@ -60,4 +60,4 @@ std::istream& operator>>(std::istream& is, line_increment& v);
 }
 }
 
-#endif /* FLOWABLE_TEXT_H_ */
+#endif /* TYPES_FLOWABLE_TEXT_H_ */

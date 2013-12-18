@@ -22,11 +22,12 @@
  *      Author: nicholas
  */
 
-#ifndef FOCUS_H_
-#define FOCUS_H_
+#ifndef TYPES_FOCUS_H_
+#define TYPES_FOCUS_H_
 #include <boost/variant.hpp>
 #include <iosfwd>
 #include "func_iri.h"
+#include "boolean.h"
 
 namespace svg
 {
@@ -34,6 +35,12 @@ namespace types
 {
 namespace focus
 {
+
+enum class focusable_enum_t
+{
+    _auto
+};
+using focusable = boost::variant<focusable_enum_t, boolean>;
 
 enum class focusHighlight
 {
@@ -48,6 +55,9 @@ enum class navigation_enum_t
 };
 using navigation = boost::variant<navigation_enum_t, func_iri>;
 
+std::ostream& operator<<(std::ostream& os, const focusable& v);
+std::istream& operator>>(std::istream& is, focusable& v);
+
 std::ostream& operator<<(std::ostream& os, focusHighlight v);
 std::istream& operator>>(std::istream& is, focusHighlight& v);
 
@@ -58,4 +68,4 @@ std::istream& operator>>(std::istream& is, navigation& v);
 }
 }
 
-#endif /* FOCUS_H_ */
+#endif /* TYPES_FOCUS_H_ */

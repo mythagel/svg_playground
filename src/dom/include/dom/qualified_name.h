@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef QUALIFIED_NAME_H_
-#define QUALIFIED_NAME_H_
+#ifndef DOM_QUALIFIED_NAME_H_
+#define DOM_QUALIFIED_NAME_H_
 #include <string>
 
 namespace dom
@@ -45,4 +45,4 @@ struct qualified_name
 
 }
 
-#endif /* QUALIFIED_NAME_H_ */
+#endif /* DOM_QUALIFIED_NAME_H_ */

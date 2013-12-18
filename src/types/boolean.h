@@ -16,48 +16,30 @@
  */
 
 /*
- * animate.h
+ * boolean.h
  *
- *  Created on: 2013-12-17
+ *  Created on: 2013-12-18
  *      Author: nicholas
  */
 
-#ifndef TYPES_ANIMATE_H_
-#define TYPES_ANIMATE_H_
+#ifndef BOOLEAN_H_
+#define BOOLEAN_H_
 #include <iosfwd>
-#include <boost/variant.hpp>
-#include <string>
-#include "clock_value.h"
 
 namespace svg
 {
 namespace types
 {
-namespace animate
-{
 
-enum class syncBehaviorDefault
+struct boolean
 {
-    canSlip,
-    locked,
-    independent,
-    inherit
+    bool value;
 };
 
-enum class syncToleranceDefault_enum_t
-{
-    inherit
-};
-using syncToleranceDefault = boost::variant<syncToleranceDefault_enum_t, clock_value>;
-
-std::ostream& operator<<(std::ostream& os, syncBehaviorDefault v);
-std::istream& operator>>(std::istream& is, syncBehaviorDefault& v);
-
-std::ostream& operator<<(std::ostream& os, const syncToleranceDefault& v);
-std::istream& operator>>(std::istream& is, syncToleranceDefault& v);
+std::ostream& operator<<(std::ostream& os, const boolean& b);
+std::istream& operator>>(std::istream& is, boolean& b);
 
 }
 }
-}
 
-#endif /* TYPES_ANIMATE_H_ */
+#endif /* BOOLEAN_H_ */

@@ -1,10 +1,10 @@
-#include "types/parsers/pathparser.h"
+#include "types/parsers/path.h"
 #include <iostream>
 #include <string>
 #include <sstream>
 #include <stdexcept>
 
-struct normalise_path : svg::path::parser
+struct normalise_path : svg::types::parsers::path::parser
 {
     std::stringstream s;
     

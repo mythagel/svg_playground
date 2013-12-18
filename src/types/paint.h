@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef PAINT_H_
-#define PAINT_H_
+#ifndef TYPES_PAINT_H_
+#define TYPES_PAINT_H_
 #include <boost/variant.hpp>
 #include "colour.h"
 #include "length.h"
@@ -179,4 +179,4 @@ std::istream& operator>>(std::istream& is, color_rendering& v);
 }
 }
 
-#endif /* PAINT_H_ */
+#endif /* TYPES_PAINT_H_ */

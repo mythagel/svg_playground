@@ -16,21 +16,39 @@
  */
 
 /*
- * attr.cpp
+ * boolean.cpp
  *
- *  Created on: 2013-12-17
+ *  Created on: 2013-12-18
  *      Author: nicholas
  */
 
-#include "attr.h"
+#include "boolean.h"
+#include <string>
+#include <ostream>
+#include <istream>
+#include <stdexcept>
 
 namespace svg
 {
-namespace attr
+namespace types
 {
 
-typed_attribute::~typed_attribute()
+std::ostream& operator<<(std::ostream& os, const boolean& b)
 {
+    os << (b.value ? "true" : "false" );
+    return os;
+}
+std::istream& operator>>(std::istream& is, boolean& b)
+{
+    std::string tok;
+    is >> tok;
+    if(tok == "true")
+        b.value = true;
+    else if(tok == "false")
+        b.value = false;
+    else
+        throw std::invalid_argument("unrecognised value for boolean: " + tok);
+    return is;
 }
 
 }

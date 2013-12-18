@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef BIDI_H_
-#define BIDI_H_
+#ifndef TYPES_BIDI_H_
+#define TYPES_BIDI_H_
 #include <iosfwd>
 
 namespace svg
@@ -58,4 +58,4 @@ std::istream& operator>>(std::istream& is, unicode_bidi& v);
 }
 }
 
-#endif /* BIDI_H_ */
+#endif /* TYPES_BIDI_H_ */

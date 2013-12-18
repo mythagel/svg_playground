@@ -18,40 +18,53 @@
 /*
  * func_iri.cpp
  *
- *  Created on: 2013-12-17
+ *  Created on: 2013-12-18
  *      Author: nicholas
  */
 
 #include "func_iri.h"
-#include <ostream>
-#include <istream>
-#include <iterator>
 #include <stdexcept>
-#include "parsers/func_iri.h"
+#include <system_error>
 
 namespace svg
 {
 namespace types
 {
-
-std::ostream& operator<<(std::ostream& os, const func_iri& iri)
+namespace parsers
 {
-    os << "url(" << iri << ")";
-    return os;
+
+namespace
+{
+inline bool throw_if(bool cond, const std::string& what)
+{
+    if(cond) throw std::runtime_error(what);
+    return cond;
 }
-std::istream& operator>>(std::istream& is, func_iri& iri)
-{
-    std::string s;
-    is >> s;
-
-    auto c = s.c_str();
-    auto end = c + s.size();
-
-    if(!parsers::parse_func_iri(c, end, iri.iri))
-        throw std::invalid_argument("expected func-iri");
-
-    return is;
 }
 
+bool parse_func_iri(const char* c, const char* const end, network::uri& uri)
+{
+    char tag[] = {'u', 'r', 'l', '('};
+    auto it = std::search(c, end, std::begin(tag), std::end(tag));
+    if(it != c) return false;
+    c += sizeof(tag);
+    throw_if(c == end, "unexpected eof");
+
+    auto iri_c = c;
+
+    while(c != end && *c != ')')
+        ++c;
+    throw_if(c == end, "unexpected eof");
+
+    std::error_code ec;
+    uri = network::make_uri(iri_c, c, ec);
+    if(ec) throw std::system_error(ec);
+
+    throw_if(*c != ')', "expected )");
+    ++c;
+    return true;
+}
+
+}
 }
 }

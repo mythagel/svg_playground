@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef NODE_H_
-#define NODE_H_
+#ifndef DOM_NODE_H_
+#define DOM_NODE_H_
 #include <memory>
 #include <vector>
 
@@ -48,4 +48,4 @@ struct node_t : std::enable_shared_from_this<node_t>
 
 }
 
-#endif /* NODE_H_ */
+#endif /* DOM_NODE_H_ */

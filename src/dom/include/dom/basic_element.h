@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef BASIC_ELEMENT_H_
-#define BASIC_ELEMENT_H_
+#ifndef DOM_BASIC_ELEMENT_H_
+#define DOM_BASIC_ELEMENT_H_
 #include "element.h"
 #include "qualified_name.h"
 #include <map>
@@ -50,4 +50,4 @@ struct basic_element_t : element_t
 
 }
 
-#endif /* BASIC_ELEMENT_H_ */
+#endif /* DOM_BASIC_ELEMENT_H_ */

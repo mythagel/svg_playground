@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef FUNC_IRI_H_
-#define FUNC_IRI_H_
+#ifndef TYPES_FUNC_IRI_H_
+#define TYPES_FUNC_IRI_H_
 #include "network/uri.hpp"
 #include <iosfwd>
 
@@ -43,4 +43,4 @@ std::istream& operator>>(std::istream& is, func_iri& iri);
 }
 }
 
-#endif /* FUNC_IRI_H_ */
+#endif /* TYPES_FUNC_IRI_H_ */

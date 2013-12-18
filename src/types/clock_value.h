@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef CLOCK_VALUE_H_
-#define CLOCK_VALUE_H_
+#ifndef TYPES_CLOCK_VALUE_H_
+#define TYPES_CLOCK_VALUE_H_
 #include <iosfwd>
 
 namespace svg
@@ -51,4 +51,4 @@ std::istream& operator>>(std::istream& is, clock_value& l);
 }
 }
 
-#endif /* CLOCK_VALUE_H_ */
+#endif /* TYPES_CLOCK_VALUE_H_ */

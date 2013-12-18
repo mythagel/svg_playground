@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef COLOUR_H_
-#define COLOUR_H_
+#ifndef TYPES_COLOUR_H_
+#define TYPES_COLOUR_H_
 #include <cstdint>
 #include <iosfwd>
 

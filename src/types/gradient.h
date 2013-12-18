@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef GRADIENT_H_
-#define GRADIENT_H_
+#ifndef TYPES_GRADIENT_H_
+#define TYPES_GRADIENT_H_
 #include <boost/variant.hpp>
 #include "colour.h"
 #include <iosfwd>
@@ -57,4 +57,4 @@ std::istream& operator>>(std::istream& is, stop_opacity& v);
 }
 }
 
-#endif /* GRADIENT_H_ */
+#endif /* TYPES_GRADIENT_H_ */

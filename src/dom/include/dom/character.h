@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef CHARACTER_H_
-#define CHARACTER_H_
+#ifndef DOM_CHARACTER_H_
+#define DOM_CHARACTER_H_
 #include <memory>
 #include <string>
 #include "node.h"
@@ -50,4 +50,4 @@ struct character_t : node_t
 
 }
 
-#endif /* CHARACTER_H_ */
+#endif /* DOM_CHARACTER_H_ */

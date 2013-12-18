@@ -25,3 +25,13 @@ ADD_EXECUTABLE(test_expat  test_expat.cpp)
 TARGET_LINK_LIBRARIES(test_expat svg expat)
 ADD_TEST(test_expat "${MAKE_CURRENT_BINARY_DIR}/test_expat")
 ADD_DEPENDENCIES(check test_expat)
+
+ADD_EXECUTABLE(test_parser_basic EXCLUDE_FROM_ALL test_parser_basic.cpp)
+TARGET_LINK_LIBRARIES(test_parser_basic svg)
+ADD_TEST(test_parser_basic "${MAKE_CURRENT_BINARY_DIR}/test_parser_basic")
+ADD_DEPENDENCIES(check test_parser_basic)
+
+ADD_EXECUTABLE(test_parser_numberlist EXCLUDE_FROM_ALL test_parser_numberlist.cpp)
+TARGET_LINK_LIBRARIES(test_parser_numberlist svg)
+ADD_TEST(test_parser_numberlist "${MAKE_CURRENT_BINARY_DIR}/test_parser_numberlist")
+ADD_DEPENDENCIES(check test_parser_numberlist)

@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef SOLIDCOLOUR_H_
-#define SOLIDCOLOUR_H_
+#ifndef TYPES_SOLIDCOLOUR_H_
+#define TYPES_SOLIDCOLOUR_H_
 #include <boost/variant.hpp>
 #include "colour.h"
 #include <iosfwd>
@@ -58,4 +58,4 @@ std::istream& operator>>(std::istream& is, solid_opacity& v);
 }
 }
 
-#endif /* SOLIDCOLOUR_H_ */
+#endif /* TYPES_SOLIDCOLOUR_H_ */

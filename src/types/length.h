@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef LENGTH_H_
-#define LENGTH_H_
+#ifndef TYPES_LENGTH_H_
+#define TYPES_LENGTH_H_
 #include <iosfwd>
 
 namespace svg
@@ -56,4 +56,4 @@ std::istream& operator>>(std::istream& is, length& l);
 }
 }
 
-#endif /* LENGTH_H_ */
+#endif /* TYPES_LENGTH_H_ */

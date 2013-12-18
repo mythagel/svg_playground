@@ -35,6 +35,15 @@ namespace types
 namespace focus
 {
 
+std::ostream& operator<<(std::ostream& os, const focusable& v)
+{
+    return os;
+}
+std::istream& operator>>(std::istream& is, focusable& v)
+{
+    return is;
+}
+
 std::ostream& operator<<(std::ostream& os, focusHighlight v)
 {
     switch(v)

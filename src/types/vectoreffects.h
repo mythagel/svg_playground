@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef VECTOREFFECTS_H_
-#define VECTOREFFECTS_H_
+#ifndef TYPES_VECTOREFFECTS_H_
+#define TYPES_VECTOREFFECTS_H_
 #include <iosfwd>
 
 namespace svg
@@ -47,4 +47,4 @@ std::istream& operator>>(std::istream& is, vector_effect& v);
 }
 }
 
-#endif /* VECTOREFFECTS_H_ */
+#endif /* TYPES_VECTOREFFECTS_H_ */

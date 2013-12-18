@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef STRINGLIST_H_
-#define STRINGLIST_H_
+#ifndef TYPES_STRINGLIST_H_
+#define TYPES_STRINGLIST_H_
 #include <vector>
 #include <string>
 #include <iosfwd>
@@ -44,4 +44,4 @@ std::istream& operator>>(std::istream& is, stringlist_t& list);
 }
 }
 
-#endif /* STRINGLIST_H_ */
+#endif /* TYPES_STRINGLIST_H_ */

@@ -1,4 +1,4 @@
-#include "types/parsers/transformparser.h"
+#include "types/parsers/transform.h"
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -16,7 +16,7 @@ void check_transform(const std::string& trans, const std::string& expected)
     auto c = trans.c_str();
     auto end = c + trans.size();
     
-    auto m = svg::transform::parse_transforms(c, end);
+    auto m = svg::types::parsers::transform::parse_transforms(c, end);
     
     std::stringstream s;
     s << m;

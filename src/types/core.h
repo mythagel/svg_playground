@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef CORE_H_
-#define CORE_H_
+#ifndef TYPES_CORE_H_
+#define TYPES_CORE_H_
 #include <iosfwd>
 
 namespace svg
@@ -46,4 +46,4 @@ std::istream& operator>>(std::istream& is, space& v);
 }
 }
 
-#endif /* CORE_H_ */
+#endif /* TYPES_CORE_H_ */

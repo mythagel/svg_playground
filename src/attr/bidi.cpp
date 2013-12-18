@@ -16,48 +16,24 @@
  */
 
 /*
- * animate.h
+ * bidi.cpp
  *
- *  Created on: 2013-12-17
+ *  Created on: 2013-12-18
  *      Author: nicholas
  */
 
-#ifndef TYPES_ANIMATE_H_
-#define TYPES_ANIMATE_H_
-#include <iosfwd>
-#include <boost/variant.hpp>
-#include <string>
-#include "clock_value.h"
+#include "bidi.h"
 
 namespace svg
 {
-namespace types
-{
-namespace animate
+namespace attr
 {
 
-enum class syncBehaviorDefault
+void map_attributes(bidi& attr, attribute_map_t& attrs)
 {
-    canSlip,
-    locked,
-    independent,
-    inherit
-};
-
-enum class syncToleranceDefault_enum_t
-{
-    inherit
-};
-using syncToleranceDefault = boost::variant<syncToleranceDefault_enum_t, clock_value>;
-
-std::ostream& operator<<(std::ostream& os, syncBehaviorDefault v);
-std::istream& operator>>(std::istream& is, syncBehaviorDefault& v);
-
-std::ostream& operator<<(std::ostream& os, const syncToleranceDefault& v);
-std::istream& operator>>(std::istream& is, syncToleranceDefault& v);
+    attrs.emplace("direction", make_attr(attr.direction));
+    attrs.emplace("unicode-bidi", make_attr(attr.unicode_bidi));
+}
 
 }
 }
-}
-
-#endif /* TYPES_ANIMATE_H_ */

@@ -16,48 +16,21 @@
  */
 
 /*
- * animate.h
+ * numberlist.cpp
  *
- *  Created on: 2013-12-17
+ *  Created on: 2013-12-18
  *      Author: nicholas
  */
 
-#ifndef TYPES_ANIMATE_H_
-#define TYPES_ANIMATE_H_
-#include <iosfwd>
-#include <boost/variant.hpp>
-#include <string>
-#include "clock_value.h"
+#include "numberlist.h"
 
 namespace svg
 {
 namespace types
 {
-namespace animate
+namespace parsers
 {
-
-enum class syncBehaviorDefault
-{
-    canSlip,
-    locked,
-    independent,
-    inherit
-};
-
-enum class syncToleranceDefault_enum_t
-{
-    inherit
-};
-using syncToleranceDefault = boost::variant<syncToleranceDefault_enum_t, clock_value>;
-
-std::ostream& operator<<(std::ostream& os, syncBehaviorDefault v);
-std::istream& operator>>(std::istream& is, syncBehaviorDefault& v);
-
-std::ostream& operator<<(std::ostream& os, const syncToleranceDefault& v);
-std::istream& operator>>(std::istream& is, syncToleranceDefault& v);
 
 }
 }
 }
-
-#endif /* TYPES_ANIMATE_H_ */

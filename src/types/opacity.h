@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef OPACITY_H_
-#define OPACITY_H_
+#ifndef TYPES_OPACITY_H_
+#define TYPES_OPACITY_H_
 #include <boost/variant.hpp>
 #include <iosfwd>
 
@@ -56,4 +56,4 @@ std::istream& operator>>(std::istream& is, stroke_opacity& v);
 }
 }
 
-#endif /* OPACITY_H_ */
+#endif /* TYPES_OPACITY_H_ */

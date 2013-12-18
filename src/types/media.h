@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef MEDIA_H_
-#define MEDIA_H_
+#ifndef TYPES_MEDIA_H_
+#define TYPES_MEDIA_H_
 #include <boost/variant.hpp>
 #include <iosfwd>
 #include "colour.h"
@@ -166,4 +166,4 @@ std::istream& operator>>(std::istream& is, viewport_fill_opacity& v);
 }
 }
 
-#endif /* MEDIA_H_ */
+#endif /* TYPES_MEDIA_H_ */

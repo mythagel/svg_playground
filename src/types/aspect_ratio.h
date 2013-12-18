@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef ASPECT_RATIO_H_
-#define ASPECT_RATIO_H_
+#ifndef TYPES_ASPECT_RATIO_H_
+#define TYPES_ASPECT_RATIO_H_
 #include <iosfwd>
 
 namespace svg
@@ -61,4 +61,4 @@ std::istream& operator>>(std::istream& is, preserveAspectRatio& v);
 }
 }
 
-#endif /* ASPECT_RATIO_H_ */
+#endif /* TYPES_ASPECT_RATIO_H_ */

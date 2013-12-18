@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef ELEMENT_H_
-#define ELEMENT_H_
+#ifndef DOM_ELEMENT_H_
+#define DOM_ELEMENT_H_
 #include <memory>
 #include <string>
 #include "node.h"
@@ -47,4 +47,4 @@ struct element_t : node_t
 
 }
 
-#endif /* ELEMENT_H_ */
+#endif /* DOM_ELEMENT_H_ */

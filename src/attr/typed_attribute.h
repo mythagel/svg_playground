@@ -16,20 +16,20 @@
  */
 
 /*
- * attr.h
+ * typed_attribute.h
  *
  *  Created on: 2013-12-17
  *      Author: nicholas
  */
 
-#ifndef SVG_ATTR_H_
-#define SVG_ATTR_H_
+#ifndef ATTR_TYPED_ATTRIBUTE_H_
+#define ATTR_TYPED_ATTRIBUTE_H_
 #include <boost/optional.hpp>
 #include <string>
 #include <functional>
 #include <sstream>
-#include "make_unique.h"
-#include <map>
+#include "../make_unique.h"
+#include <unordered_map>
 
 namespace svg
 {
@@ -117,9 +117,9 @@ auto make_attr(boost::optional<T>& value) -> std::unique_ptr<optional_typed_attr
     return make_unique<optional_typed_attribute_ref<T>>(value);
 }
 
-using attribute_map_t = std::map<std::string, std::unique_ptr<typed_attribute>>;
+using attribute_map_t = std::unordered_map<std::string, std::unique_ptr<typed_attribute>>;
 
 }
 }
 
-#endif /* SVG_ATTR_H_ */
+#endif /* ATTR_TYPED_ATTRIBUTE_H_ */

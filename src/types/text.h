@@ -22,8 +22,8 @@
  *      Author: nicholas
  */
 
-#ifndef TEXT_H_
-#define TEXT_H_
+#ifndef TYPES_TEXT_H_
+#define TYPES_TEXT_H_
 #include <boost/variant.hpp>
 #include <string>
 #include <iosfwd>
@@ -137,4 +137,4 @@ std::istream& operator>>(std::istream& is, text_align& v);
 }
 }
 
-#endif /* TEXT_H_ */
+#endif /* TYPES_TEXT_H_ */
