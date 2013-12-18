@@ -215,7 +215,10 @@ struct parser : expat::parser<parser>
         dom::element element = construct_element({ name.local, name.prefix });
 
 	    for(auto& attr : attributes)
+        {
+            std::cout << "'" << attr.first.local << "' '" << attr.first.prefix << "' = " << attr.second << "\n";
             element->set_attribute({ attr.first.local, attr.first.prefix }, attr.second);
+        }
 
         stack.push(element);
 	}
@@ -247,7 +250,7 @@ void write(std::ostream& os, const dom::node& node, int level = 0)
 
     if(auto element = std::dynamic_pointer_cast<dom::element_t>(node))
     {
-        os << indent << element->name().ns << ":" << element->name().local << "\n";
+        os << indent << element->name().ns() << ":" << element->name().local() << "\n";
         // no interface to iterate over attributes (and none needed)...
     }
     else if(auto cdata = std::dynamic_pointer_cast<dom::character_t>(node))

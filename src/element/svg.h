@@ -25,6 +25,7 @@
 #ifndef ELEMENT_SVG_H_
 #define ELEMENT_SVG_H_
 #include "dom/element.h"
+#include "../attr/typed_attribute.h"
 #include "../attr/svg.h"
 
 namespace svg

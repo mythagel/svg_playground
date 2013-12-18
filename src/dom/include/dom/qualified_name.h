@@ -25,18 +25,31 @@
 #ifndef DOM_QUALIFIED_NAME_H_
 #define DOM_QUALIFIED_NAME_H_
 #include <string>
+#include <boost/variant.hpp>
 
 namespace dom
 {
 
-struct qualified_name
+class qualified_name
 {
-    std::string ns;
-    std::string local;
+private:
+    enum class ns_e
+    {
+        xml,
+        xlink,
+        svg
+    };
+    boost::variant<ns_e, std::string> ns_;
+    std::string local_;
 
+    void assign(const std::string& local, const std::string& ns);
+public:
     qualified_name();
     explicit qualified_name(const std::string& local);
     qualified_name(const std::string& local, const std::string& ns);
+
+    std::string ns() const;
+    std::string local() const;
 
     bool operator==(const qualified_name& name) const;
     bool operator!=(const qualified_name& name) const;

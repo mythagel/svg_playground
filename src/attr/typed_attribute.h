@@ -29,7 +29,8 @@
 #include <functional>
 #include <sstream>
 #include "../make_unique.h"
-#include <unordered_map>
+#include <map>
+#include "dom/qualified_name.h"
 
 namespace svg
 {
@@ -117,7 +118,7 @@ auto make_attr(boost::optional<T>& value) -> std::unique_ptr<optional_typed_attr
     return make_unique<optional_typed_attribute_ref<T>>(value);
 }
 
-using attribute_map_t = std::unordered_map<std::string, std::unique_ptr<typed_attribute>>;
+using attribute_map_t = std::map<std::string, std::unique_ptr<typed_attribute>>;
 
 }
 }

@@ -24,33 +24,86 @@
 
 #include "dom/qualified_name.h"
 #include <tuple>
+#include <stdexcept>
 
 namespace dom
 {
+
+namespace
+{
+constexpr auto XML_NS = "http://www.w3.org/XML/1998/namespace";
+constexpr auto XLINK_NS = "http://www.w3.org/1999/xlink";
+constexpr auto SVG_NS = "http://www.w3.org/2000/svg";
+}
+
+void qualified_name::assign(const std::string& local, const std::string& ns)
+{
+    local_ = local;
+    if(ns == XML_NS)
+        ns_ = ns_e::xml;
+    else if(ns == XLINK_NS)
+        ns_ = ns_e::xlink;
+    else if(ns == SVG_NS)
+        ns_ = ns_e::svg;
+    else
+        ns_ = ns;
+}
 
 qualified_name::qualified_name()
 {
 }
 qualified_name::qualified_name(const std::string& local)
- : ns(), local(local)
+ : ns_(), local_(local)
 {
+    assign(local, {});
 }
 qualified_name::qualified_name(const std::string& local, const std::string& ns)
- : ns(ns), local(local)
+ : ns_(ns), local_(local)
 {
+    assign(local, ns);
+}
+
+std::string qualified_name::ns() const
+{
+    struct map : boost::static_visitor<std::string>
+    {
+        std::string operator()(ns_e ns) const
+        {
+            switch(ns)
+            {
+                case ns_e::xml:
+                    return XML_NS;
+                case ns_e::xlink:
+                    return XLINK_NS;
+                case ns_e::svg:
+                    return SVG_NS;
+            }
+            throw std::logic_error("Unmapped namespace");
+        }
+
+        std::string operator()(const std::string &ns) const
+        {
+            return ns;
+        }
+    };
+    return boost::apply_visitor(map{}, ns_);
+}
+std::string qualified_name::local() const
+{
+    return local_;
 }
 
 bool qualified_name::operator==(const qualified_name& name) const
 {
-    return std::tie(ns, local) == std::tie(name.ns, name.local);
+    return std::tie(ns_, local_) == std::tie(name.ns_, name.local_);
 }
 bool qualified_name::operator!=(const qualified_name& name) const
 {
-    return std::tie(ns, local) != std::tie(name.ns, name.local);
+    return std::tie(ns_, local_) != std::tie(name.ns_, name.local_);
 }
 bool qualified_name::operator<(const qualified_name& name) const
 {
-    return std::tie(ns, local) < std::tie(name.ns, name.local);
+    return std::tie(ns_, local_) < std::tie(name.ns_, name.local_);
 }
 
 }

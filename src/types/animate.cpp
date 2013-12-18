@@ -28,6 +28,8 @@
 #include <string>
 #include <stdexcept>
 
+#include <sstream>
+
 namespace svg
 {
 namespace types
@@ -73,10 +75,52 @@ std::istream& operator>>(std::istream& is, syncBehaviorDefault& v)
 
 std::ostream& operator<<(std::ostream& os, const syncToleranceDefault& v)
 {
-    return os;
+    struct map : boost::static_visitor<std::ostream&>
+    {
+        map(std::ostream& os)
+         : os(os)
+        {
+        }
+
+        std::ostream& os;
+        std::ostream& operator()(syncToleranceDefault_enum_t e) const
+        {
+            switch(e)
+            {
+                case syncToleranceDefault_enum_t::inherit:
+                    os << "inherit";
+                    return os;
+                default:
+                    throw std::logic_error("Unexpected syncToleranceDefault enum");
+            }
+        }
+
+        std::ostream& operator()(const clock_value &clock) const
+        {
+            os << clock;
+            return os;
+        }
+    };
+    return boost::apply_visitor(map{os}, v);
 }
 std::istream& operator>>(std::istream& is, syncToleranceDefault& v)
 {
+    std::string tok;
+    is >> tok;
+    if(tok == "inherit")
+    {
+        v = syncToleranceDefault_enum_t::inherit;
+    }
+    else
+    {
+        /* Ugh. This is awful.
+           It'd be much better if there was a bidirectional stream
+           i.e. mark and reverse */
+        std::istringstream ss(tok);
+        clock_value clock;
+        ss >> clock;
+        v = clock;
+    }
     return is;
 }
 
