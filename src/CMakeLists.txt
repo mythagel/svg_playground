@@ -40,5 +40,7 @@ attr/core_common.cpp
 attr/properties.cpp
 attr/svg.cpp
 
+element/svg.cpp
+
 )
 target_link_libraries(svg dom network-uri)
