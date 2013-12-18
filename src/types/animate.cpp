@@ -113,9 +113,9 @@ std::istream& operator>>(std::istream& is, syncToleranceDefault& v)
     }
     else
     {
-        /* Ugh. This is awful.
-           It'd be much better if there was a bidirectional stream
-           i.e. mark and reverse */
+        /* Actually... all parsing is on fixed size strings.
+           perhaps change to to_string() & from_string()
+           */
         std::istringstream ss(tok);
         clock_value clock;
         ss >> clock;
