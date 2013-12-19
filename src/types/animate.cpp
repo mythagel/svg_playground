@@ -105,17 +105,13 @@ std::ostream& operator<<(std::ostream& os, const syncToleranceDefault& v)
 }
 std::istream& operator>>(std::istream& is, syncToleranceDefault& v)
 {
-    std::string tok;
-    is >> tok;
+    std::string tok(std::istream_iterator<char>{is}, std::istream_iterator<char>{});
     if(tok == "inherit")
     {
         v = syncToleranceDefault_enum_t::inherit;
     }
     else
     {
-        /* Actually... all parsing is on fixed size strings.
-           perhaps change to to_string() & from_string()
-           */
         std::istringstream ss(tok);
         clock_value clock;
         ss >> clock;
